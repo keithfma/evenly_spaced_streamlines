@@ -62,48 +62,35 @@ while ~isempty(x_queue)
     y_seed = y_queue{1}; y_queue(1) = [];    
     % check each candidate point in random order
     for ii = randperm(length(x_seed))
-        % TODO: move distance computation to function to avoid repetition
-        dx = x_seed(ii) - x_line;
-        dy = y_seed(ii) - y_line;
-        d_min_sq = min(dx.*dx + dy.*dy);
+        d_min_sq = min_squared_dist(x_seed(ii), y_seed(ii), x_line, y_line);
         if d_min_sq >= d_sep_sq
             % create new streamline
-            [x_line_new, y_line_new, seed_idx] = get_streamline(...
+            [x_new, y_new, seed_idx] = get_streamline(...
                 xx, yy, uu, vv, x_seed(ii), y_seed(ii), step_size);
-            if ~isempty(x_line_new) 
-                
+            if ~isempty(x_new) 
                 % trim new streamline
-                % TODO: vectorize this loop
-                % TODO: move to function to avoid repetition
-                for kk = seed_idx:length(x_line_new)
-                    dx = x_line_new(kk)-x_line;
-                    dy = y_line_new(kk)-y_line;                    
-                    d_min_sq = min(dx.*dx + dy.*dy);
+                for kk = seed_idx:length(x_new)
+                    d_min_sq = min_squared_dist(x_new(kk), y_new(kk), x_line, y_line);
                     if d_min_sq <= d_test_sq
-                        x_line_new(kk:end) = [];
-                        y_line_new(kk:end) = [];
+                        x_new(kk:end) = [];
+                        y_new(kk:end) = [];
                         break
                     end
                 end
                 for kk = seed_idx:-1:1
-                    dx = x_line_new(kk)-x_line;
-                    dy = y_line_new(kk)-y_line;                    
-                    d_min_sq = min(dx.*dx + dy.*dy);
+                    d_min_sq = min_squared_dist(x_new(kk), y_new(kk), x_line, y_line);                    
                     if d_min_sq <= d_test_sq
-                        x_line_new(1:kk) = [];
-                        y_line_new(1:kk) = [];
+                        x_new(1:kk) = [];
+                        y_new(1:kk) = [];
                         break
                     end
                 end
-                
                 % add seed candidate points to queue
                 [x_queue{end+1}, y_queue{end+1}] = ...
-                    get_seed_candidates(x_line_new, y_line_new, d_sep); %#ok!
-                
+                    get_seed_candidates(x_new, y_new, d_sep); %#ok!
                 % add trimmed streamline to list
-                x_line = [x_line; NaN; x_line_new]; %#ok!
-                y_line = [y_line; NaN; y_line_new]; %#ok!
-
+                x_line = [x_line; NaN; x_new]; %#ok!
+                y_line = [y_line; NaN; y_new]; %#ok!
             end
         end
     end
@@ -114,6 +101,21 @@ end
 plot(x_line, y_line, '-k');
 
 keyboard
+
+function [d_min_sq] = min_squared_dist(x_from, y_from, x_to, y_to)
+%
+% Compute minimum distance between the point (x_from, y_from) and all
+% points in (x_to, y_to)
+%
+% Arguments:
+%   x_from, y_from: Scalars, single point to compute distance from
+%   x_to, y_to: Vectors, many points to compute distance to
+%   d_min: Scalar, mininum distance
+% %
+
+dx = x_from - x_to;
+dy = y_from - y_to;
+d_min_sq = min(dx.*dx + dy.*dy);
 
 function [x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep)
 %
