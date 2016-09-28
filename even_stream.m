@@ -43,7 +43,7 @@ while isnan(u0) || isnan(v0)
 end
 
 % add first stream line
-[x_line, y_line] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
+[x_line, y_line, ~] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
 
 % create seed point candidate queue
 x_queue = cell(0); 
@@ -65,17 +65,22 @@ while ~isempty(x_queue)
         d_min_sq = min(dx.*dx + dy.*dy);
         if d_min_sq >= d_sep_sq
             % create new streamline
-            [x_line_new, y_line_new] = get_streamline(xx, yy, uu, vv, ...
-                x_seed(ii), y_seed(ii), step_size);
-            if isempty(x_line_new)
-                continue
+            [x_line_new, y_line_new, seed_idx] = get_streamline(...
+                xx, yy, uu, vv, x_seed(ii), y_seed(ii), step_size);
+            if ~isempty(x_line_new) 
+                
+                % trim new streamline
+%                 seed_idx = find(
+
+                % add seed candidate points to queue
+                [x_queue{end+1}, y_queue{end+1}] = ...
+                    get_seed_candidates(x_line_new, y_line_new, d_sep); %#ok!
+                
+                % add trimmed streamline to list
+                x_line = [x_line; NaN; x_line_new]; %#ok!
+                y_line = [y_line; NaN; y_line_new]; %#ok!
+
             end
-            % TODO: trim
-            x_line = [x_line; NaN; x_line_new]; %#ok!
-            y_line = [y_line; NaN; y_line_new]; %#ok!
-            % add seed candidate points to queue
-            [x_queue{end+1}, y_queue{end+1}] = ...
-                get_seed_candidates(x_line_new, y_line_new, d_sep); %#ok!
         end
     end
 
@@ -110,7 +115,7 @@ seed = [midpoint+d_sep*normal; midpoint-d_sep*normal];
 x_seed = seed(:,1);
 y_seed = seed(:,2);
 
-function [xs, ys] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
+function [xs, ys, i0] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
 %
 % Compute streamline in both directions starting at x0, y0
 %
@@ -118,26 +123,41 @@ function [xs, ys] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
 %   See documentation for stream2 for input argument definitions
 %   xs, ys : Vectors, stream line x- and y-coordinates, returns [] if
 %       stream line has zero length
+%   i0: Scalar, index of seed point in output streamline
 % %
 
 fwd = stream2(xx, yy, uu, vv, x0, y0, step_size);
 xy_fwd = fwd{1};
-has_fwd = length(xy_fwd) > 1;
+has_fwd = size(xy_fwd,1) > 1;
 
 rev = stream2(xx, yy, -uu, -vv, x0, y0, step_size);
 xy_rev = rev{1};
-has_rev = length(xy_rev) > 1;
+has_rev = size(xy_rev,1) > 1;
 
 if has_fwd && has_rev
     xs = [xy_rev(end:-1:2, 1); xy_fwd(:, 1)];
     ys = [xy_rev(end:-1:2, 2); xy_fwd(:, 2)];
+    i0 = size(xy_rev,1);
 elseif has_rev
     xs = xy_rev(:,1);
     ys = xy_rev(:,2);
+    i0 = 1;
 elseif has_fwd
     xs = xy_fwd(:,1);
     ys = xy_fwd(:,2);
+    i0 = 1;
 else
     xs = [];
     ys = [];
+    i0 = [];
 end
+
+%<DEBUG>
+if ~isempty(i0)
+    % i0 = i0+1; % fails, which is good
+    fprintf('x: %g\n', xs(i0)-x0);
+    assert(abs(xs(i0)-x0) < 1e-15, 'seed index is incorrect');
+    fprintf('y: %g\n', ys(i0)-y0);
+    assert(abs(ys(i0)-y0) < 1e-15, 'seed index is incorrect');
+end
+%</DEBUG>
