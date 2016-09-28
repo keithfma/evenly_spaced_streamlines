@@ -8,6 +8,9 @@ vv = linspace(-2, 2, 20);
 hh = vv(2)-vv(1);
 [xx, yy] = meshgrid(vv);
 zz = xx .* exp(-xx.^2 - yy.^2);
+%<DEBUG> Confirm program can deal with NaNs
+zz(xx>1.5) = NaN;
+%</DEBUG>
 [dzdx, dzdy] = gradient(zz, hh, hh);
 
 
@@ -20,7 +23,7 @@ step_size = 0.1*d_sep;
 
 %<DEBUG>
 figure
-imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz);
+imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz, 'AlphaData', ~isnan(zz));
 hold on
 %</DEBUG>
 
