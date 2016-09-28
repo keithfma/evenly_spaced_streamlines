@@ -62,24 +62,21 @@ while ~isempty(x_queue)
     y_seed = y_queue{1}; y_queue(1) = [];    
     % check each candidate point in random order
     for ii = randperm(length(x_seed))
-        % if dist_gte(d_sep_sq, x_seed(ii), y_seed(ii), x_line, y_line)
-        if ~dist_lt(d_sep_sq, 2*d_sep, x_seed(ii), y_seed(ii), x_line, y_line)
+        if dist_gte(d_sep_sq, x_seed(ii), y_seed(ii), x_line, y_line)
             % create new streamline
             [x_new, y_new, seed_idx] = get_streamline(...
                 xx, yy, uu, vv, x_seed(ii), y_seed(ii), step_size);
             if ~isempty(x_new) 
                 % trim new streamline
-                for kk = seed_idx:length(x_new)                    
-                    % if ~dist_gte(d_test_sq, x_new(kk), y_new(kk), x_line, y_line)
-                    if dist_lt(d_test_sq, 2*d_test, x_new(kk), y_new(kk), x_line, y_line)
+                for kk = seed_idx:length(x_new)
+                    if ~dist_gte(d_test_sq, x_new(kk), y_new(kk), x_line, y_line)
                         x_new(kk:end) = [];
                         y_new(kk:end) = [];
                         break
                     end
                 end
                 for kk = seed_idx:-1:1
-                    % if ~dist_gte(d_test_sq, x_new(kk), y_new(kk), x_line, y_line)                        
-                    if dist_lt(d_test_sq, 2*d_test, x_new(kk), y_new(kk), x_line, y_line)
+                    if ~dist_gte(d_test_sq, x_new(kk), y_new(kk), x_line, y_line)
                         x_new(1:kk) = [];
                         y_new(1:kk) = [];
                         break
@@ -102,7 +99,7 @@ plot(x_line, y_line, '-k');
 
 keyboard
 
-function [result] = dist_lt(d_min_sq, rng, x_from, y_from, x_to, y_to)
+function [result] = dist_gte(d_min_sq, x_from, y_from, x_to, y_to)
 %
 % Return TRUE if minimum distance between the point (x_from, y_from) and 
 % all points in (x_to, y_to) is greater than or equal to d_min_sq, else 
@@ -114,38 +111,13 @@ function [result] = dist_lt(d_min_sq, rng, x_from, y_from, x_to, y_to)
 %   d_min: Scalar, mininum distance
 % %
 
-result = false;
-
-mask = (x_to > x_from-rng) & (x_to < x_from+rng) & ...
-    (y_to > y_from-rng) & (y_to < y_from+rng);
-
-if any(mask)
-    dx = x_from - x_to(mask);
-    dy = y_from - y_to(mask);
-    if min(dx.*dx + dy.*dy) < d_min_sq
-        result = true;
-    end
+dx = x_from - x_to;
+dy = y_from - y_to;
+if min(dx.*dx + dy.*dy) >= d_min_sq
+    result = true;
+else
+    result = false;
 end
-
-% function [result] = dist_gte(d_min_sq, x_from, y_from, x_to, y_to)
-% %
-% % Return TRUE if minimum distance between the point (x_from, y_from) and 
-% % all points in (x_to, y_to) is greater than or equal to d_min_sq, else 
-% % return FALSE
-% %
-% % Arguments:
-% %   x_from, y_from: Scalars, single point to compute distance from
-% %   x_to, y_to: Vectors, many points to compute distance to
-% %   d_min: Scalar, mininum distance
-% % %
-% 
-% dx = x_from - x_to;
-% dy = y_from - y_to;
-% if min(dx.*dx + dy.*dy) >= d_min_sq
-%     result = true;
-% else
-%     result = false;
-% end
 
 function [x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep)
 %
