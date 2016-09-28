@@ -42,33 +42,50 @@ while isnan(u0) || isnan(v0)
     v0 = interp2(xx, yy, vv, x0, y0);
 end
 
-% init stream line and seed candidates
+% add first stream line
 [x_line, y_line] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
-[x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep);
+
+% create seed point candidate queue
+x_queue = cell(0); 
+y_queue = cell(0);
+[x_queue{end+1}, y_queue{end+1}] = ...
+    get_seed_candidates(x_line, y_line, d_sep);
 
 %% main loop
 
-% search current seed candidates for valid point
 d_sep_sq = d_sep*d_sep;
-for ii = randperm(length(x_seed));
-    delta_x = x_seed(ii)-x_line;
-    delta_y = y_seed(ii)-y_line;
-    d_min_sq = min(delta_x.*delta_x+delta_y.*delta_y);
-    if d_min_sq >= d_sep_sq
-        x_next = x_seed(ii);
-        y_next = y_seed(ii);
+while ~isempty(x_queue)
+    % pop seed candidates from queue
+    x_seed = x_queue{1}; x_queue(1) = [];
+    y_seed = y_queue{1}; y_queue(1) = [];    
+    % check each candidate point in random order
+    for ii = randperm(length(x_seed))
+        dx = x_seed(ii) - x_line;
+        dy = y_seed(ii) - y_line;
+        d_min_sq = min(dx.*dx + dy.*dy);
+        if d_min_sq >= d_sep_sq
+            % create new streamline
+            [x_line_new, y_line_new] = get_streamline(xx, yy, uu, vv, ...
+                x_seed(ii), y_seed(ii), step_size);
+            if isempty(x_line_new)
+                continue
+            end
+            % TODO: trim
+            x_line = [x_line; NaN; x_line_new]; %#ok!
+            y_line = [y_line; NaN; y_line_new]; %#ok!
+            % add seed candidate points to queue
+            [x_queue{end+1}, y_queue{end+1}] = ...
+                get_seed_candidates(x_line_new, y_line_new, d_sep); %#ok!
+        end
     end
+
 end
 
-
-%% debug plot
+%% debug
 
 plot(x_line, y_line, '-k');
-hold on
-plot(x_seed, y_seed, '.r');
-plot(x_next, y_next, 'ob');
 
-
+keyboard
 
 function [x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep)
 %
@@ -82,6 +99,7 @@ function [x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep)
 
 % get unit normal vectors at segment midpoints
 xy = [x_line, y_line];
+fprintf('%i\n', length(x_line));
 tangent = diff(xy);
 normal = [tangent(:,2), -tangent(:,1)];
 normal = bsxfun(@rdivide, normal, sqrt(sum(normal.*normal, 2)));
@@ -92,22 +110,34 @@ seed = [midpoint+d_sep*normal; midpoint-d_sep*normal];
 x_seed = seed(:,1);
 y_seed = seed(:,2);
 
-function [x_line, y_line] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
+function [xs, ys] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
 %
 % Compute streamline in both directions starting at x0, y0
 %
 % Arguments: 
 %   See documentation for stream2 for input argument definitions
-%   x_line, y_line :
+%   xs, ys : Vectors, stream line x- and y-coordinates, returns [] if
+%       stream line has zero length
 % %
 
-xy = stream2(xx, yy, uu, vv, x0, y0, step_size);
-x_fwd = xy{1}(:,1);
-y_fwd = xy{1}(:,2);
+fwd = stream2(xx, yy, uu, vv, x0, y0, step_size);
+xy_fwd = fwd{1};
+has_fwd = length(xy_fwd) > 1;
 
-xy = stream2(xx, yy, -uu, -vv, x0, y0, step_size);
-x_rev = xy{1}(:,1);
-y_rev = xy{1}(:,2);
+rev = stream2(xx, yy, -uu, -vv, x0, y0, step_size);
+xy_rev = rev{1};
+has_rev = length(xy_rev) > 1;
 
-x_line = [x_rev(end:-1:2); x_fwd];
-y_line = [y_rev(end:-1:2); y_fwd];    
+if has_fwd && has_rev
+    xs = [xy_rev(end:-1:2, 1); xy_fwd(:, 1)];
+    ys = [xy_rev(end:-1:2, 2); xy_fwd(:, 2)];
+elseif has_rev
+    xs = xy_rev(:,1);
+    ys = xy_rev(:,2);
+elseif has_fwd
+    xs = xy_fwd(:,1);
+    ys = xy_fwd(:,2);
+else
+    xs = [];
+    ys = [];
+end

@@ -18,7 +18,10 @@ d_sep = 0.05*range(vv);
 d_test = 0.5*d_sep;
 step_size = 0.1*d_sep;
 
+%<DEBUG>
 figure
 imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz);
 hold on
+%</DEBUG>
+
 even_stream(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
