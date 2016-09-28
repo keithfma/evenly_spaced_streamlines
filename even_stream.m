@@ -150,12 +150,10 @@ function [xs, ys, i0] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
 % %
 
 fwd = stream2(xx, yy, uu, vv, x0, y0, step_size);
-% xy_fwd = fwd{1};
 xy_fwd = fwd{1}(~any(isnan(fwd{1}), 2), :); % drop NaN rows
 has_fwd = size(xy_fwd,1) > 1;
 
 rev = stream2(xx, yy, -uu, -vv, x0, y0, step_size);
-% xy_rev = rev{1};
 xy_rev = rev{1}(~any(isnan(rev{1}), 2), :); % drop NaN rows
 has_rev = size(xy_rev,1) > 1;
 
@@ -177,13 +175,12 @@ else
     i0 = [];
 end
 
-%<DEBUG>
-if any(isnan(xs)) || any(isnan(ys))
-    fprintf('NaN in streamline - debugging\n');
-    keyboard
-end
-%</DEBUG>
-
+% %<DEBUG>
+% if any(isnan(xs)) || any(isnan(ys))
+%     fprintf('NaN in streamline - debugging\n');
+%     keyboard
+% end
+% %</DEBUG>
 
 % %<DEBUG>
 % if ~isempty(i0)
