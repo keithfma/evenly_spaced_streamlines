@@ -1,4 +1,5 @@
-function xyld = even_stream2(xx, yy, uu, vv, d_sep, d_test, step_size)
+function [xs, ys, ls, ds] = ...
+    even_stream2(xx, yy, uu, vv, d_sep, d_test, step_size)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1).
 % Results can be used to plot using ____, ____, ...
@@ -15,10 +16,15 @@ function xyld = even_stream2(xx, yy, uu, vv, d_sep, d_test, step_size)
 %
 %   step_size:
 %
-%   xyld: Matrix, stream line data with one row for each point as 
-%       [x-coord, y-coord, length (along line), distance (to nearest line)],
-%       individual lines are separated by NaNs
-% 
+%   xs, ys: Vectors, x-coord and y-coord for stream line points, individual
+%       lines are separated by NaNs
+%
+%   ls: Vector, length along streamline for stream line points, individual
+%       lines are separated by NaNs
+%
+%   ds: Vector, distance to nearest neighboring streamline for stream line
+%       points, individual lines are separated by NaNs
+%  
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
 %   Arbitrary Density. In W. Lefer & M. Grave (Eds.), Visualization in
@@ -57,6 +63,7 @@ y_queue = cell(0);
 d_sep_sq = d_sep*d_sep;
 d_test_sq = d_test*d_test;
 
+num_lines = 0;
 while ~isempty(x_queue)
     % pop seed candidates from queue
     x_seed = x_queue{1}; x_queue(1) = [];
@@ -89,16 +96,24 @@ while ~isempty(x_queue)
                 % add trimmed streamline to list
                 x_line = [x_line; NaN; x_new]; %#ok!
                 y_line = [y_line; NaN; y_new]; %#ok!
+                % tally and report
+                num_lines = num_lines+1;
+                fprintf('# streamlines: %d\n', num_lines);                
             end
         end
     end
 end
 
-%% debug
+%% prepare outputs
 
-xyld = [x_line, y_line];
+xs = x_line; 
+ys = y_line;
+ls = [];
+ds = [];
 
+%<DEBUG>
 keyboard
+%</DEBUG>
 
 function [result] = dist_gte(d_min_sq, x_from, y_from, x_to, y_to)
 %
@@ -112,13 +127,8 @@ function [result] = dist_gte(d_min_sq, x_from, y_from, x_to, y_to)
 %   d_min: Scalar, mininum distance
 % %
 
-dx = x_from - x_to;
-dy = y_from - y_to;
-if min(dx.*dx + dy.*dy) >= d_min_sq
-    result = true;
-else
-    result = false;
-end
+dxy = bsxfun(@minus, [x_from, y_from],  [x_to, y_to]);
+result = min(sum(dxy.*dxy, 2)) >= d_min_sq;
 
 function [x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep)
 %
@@ -132,7 +142,6 @@ function [x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep)
 
 % get unit normal vectors at segment midpoints
 xy = [x_line, y_line];
-fprintf('%i\n', length(x_line));
 tangent = diff(xy);
 normal = [tangent(:,2), -tangent(:,1)];
 normal = bsxfun(@rdivide, normal, sqrt(sum(normal.*normal, 2)));

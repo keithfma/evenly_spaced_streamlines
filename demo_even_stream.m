@@ -19,12 +19,12 @@ d_sep = 0.05*range(vv);
 d_test = 0.5*d_sep;
 step_size = 0.1*d_sep;
 
-xyld = even_stream2(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
+[xs, ys, ls, ds] = even_stream2(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
 
 %<DEBUG>
 figure
 imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz, 'AlphaData', ~isnan(zz));
 hold on
-plot(xyld(:,1), xyld(:,2), '-k');
+plot(xs, ys, '-k');
 %</DEBUG>
 
