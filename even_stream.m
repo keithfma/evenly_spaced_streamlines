@@ -54,12 +54,15 @@ y_queue = cell(0);
 %% main loop
 
 d_sep_sq = d_sep*d_sep;
+d_test_sq = d_test*d_test;
+
 while ~isempty(x_queue)
     % pop seed candidates from queue
     x_seed = x_queue{1}; x_queue(1) = [];
     y_seed = y_queue{1}; y_queue(1) = [];    
     % check each candidate point in random order
     for ii = randperm(length(x_seed))
+        % TODO: move distance computation to function to avoid repetition
         dx = x_seed(ii) - x_line;
         dy = y_seed(ii) - y_line;
         d_min_sq = min(dx.*dx + dy.*dy);
@@ -70,8 +73,29 @@ while ~isempty(x_queue)
             if ~isempty(x_line_new) 
                 
                 % trim new streamline
-%                 seed_idx = find(
-
+                % TODO: vectorize this loop
+                % TODO: move to function to avoid repetition
+                for kk = seed_idx:length(x_line_new)
+                    dx = x_line_new(kk)-x_line;
+                    dy = y_line_new(kk)-y_line;                    
+                    d_min_sq = min(dx.*dx + dy.*dy);
+                    if d_min_sq <= d_test_sq
+                        x_line_new(kk:end) = [];
+                        y_line_new(kk:end) = [];
+                        break
+                    end
+                end
+                for kk = seed_idx:-1:1
+                    dx = x_line_new(kk)-x_line;
+                    dy = y_line_new(kk)-y_line;                    
+                    d_min_sq = min(dx.*dx + dy.*dy);
+                    if d_min_sq <= d_test_sq
+                        x_line_new(1:kk) = [];
+                        y_line_new(1:kk) = [];
+                        break
+                    end
+                end
+                
                 % add seed candidate points to queue
                 [x_queue{end+1}, y_queue{end+1}] = ...
                     get_seed_candidates(x_line_new, y_line_new, d_sep); %#ok!
@@ -152,12 +176,12 @@ else
     i0 = [];
 end
 
-%<DEBUG>
-if ~isempty(i0)
-    % i0 = i0+1; % fails, which is good
-    fprintf('x: %g\n', xs(i0)-x0);
-    assert(abs(xs(i0)-x0) < 1e-15, 'seed index is incorrect');
-    fprintf('y: %g\n', ys(i0)-y0);
-    assert(abs(ys(i0)-y0) < 1e-15, 'seed index is incorrect');
-end
-%</DEBUG>
+% %<DEBUG>
+% if ~isempty(i0)
+%     % i0 = i0+1; % fails, which is good
+%     fprintf('x: %g\n', xs(i0)-x0);
+%     assert(abs(xs(i0)-x0) < 1e-15, 'seed index is incorrect');
+%     fprintf('y: %g\n', ys(i0)-y0);
+%     assert(abs(ys(i0)-y0) < 1e-15, 'seed index is incorrect');
+% end
+% %</DEBUG>
