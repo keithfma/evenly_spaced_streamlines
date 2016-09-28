@@ -1,7 +1,7 @@
-function [x_line, y_line] = ...
-    even_stream(xx, yy, uu, vv, d_sep, d_test, step_size) %#ok!
+function xyld = even_stream2(xx, yy, uu, vv, d_sep, d_test, step_size)
 %
-% Plot evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1).
+% Compute evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1).
+% Results can be used to plot using ____, ____, ...
 %
 % Arguments:
 %
@@ -15,14 +15,15 @@ function [x_line, y_line] = ...
 %
 %   step_size:
 %
-%   x_line, y_line: Vectors, x- and y-coordinates of streamline points,
+%   xyld: Matrix, stream line data with one row for each point as 
+%       [x-coord, y-coord, length (along line), distance (to nearest line)],
 %       individual lines are separated by NaNs
 % 
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
 %   Arbitrary Density. In W. Lefer & M. Grave (Eds.), Visualization in
-%   Scientific Computing ’97: Proceedings of the Eurographics Workshop in
-%   Boulogne-sur-Mer France, April 28--30, 1997 (pp. 43–55). inbook,
+%   Scientific Computing ?97: Proceedings of the Eurographics Workshop in
+%   Boulogne-sur-Mer France, April 28--30, 1997 (pp. 43?55). inbook,
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
@@ -95,7 +96,7 @@ end
 
 %% debug
 
-plot(x_line, y_line, '-k');
+xyld = [x_line, y_line];
 
 keyboard
 
