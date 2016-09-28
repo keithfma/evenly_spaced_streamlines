@@ -1,5 +1,5 @@
-function [xs, ys] = even_stream(xx, yy, uu, vv, d_sep, d_test, step_size) %#ok!
-% function [xs, ys] = even_stream(xx, yy, uu, vv, d_sep, d_test, step_size)
+function [x_line, y_line] = ...
+    even_stream(xx, yy, uu, vv, d_sep, d_test, step_size) %#ok!
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1).
 %
@@ -15,8 +15,8 @@ function [xs, ys] = even_stream(xx, yy, uu, vv, d_sep, d_test, step_size) %#ok!
 %
 %   step_size:
 %
-%   xs, ys: Vectors, x- and y-coordinates of streamline points, with lines
-%       separated by NaNs
+%   x_line, y_line: Vectors, x- and y-coordinates of streamline points,
+%       individual lines are separated by NaNs
 % 
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -42,19 +42,32 @@ while isnan(u0) || isnan(v0)
     v0 = interp2(xx, yy, vv, x0, y0);
 end
 
-% init stream line and index vectors
-[xs, ys] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
-is = 1;
+% init stream line and seed candidates
+[x_line, y_line] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
+[x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep);
 
 %% main loop
 
-[x_seed, y_seed] = get_seed_candidates(xs, ys, d_sep);
+% search current seed candidates for valid point
+d_sep_sq = d_sep*d_sep;
+for ii = randperm(length(x_seed));
+    delta_x = x_seed(ii)-x_line;
+    delta_y = y_seed(ii)-y_line;
+    d_min_sq = min(delta_x.*delta_x+delta_y.*delta_y);
+    if d_min_sq >= d_sep_sq
+        x_next = x_seed(ii);
+        y_next = y_seed(ii);
+    end
+end
+
 
 %% debug plot
 
-plot(xs, ys, '-k');
+plot(x_line, y_line, '-k');
 hold on
 plot(x_seed, y_seed, '.r');
+plot(x_next, y_next, 'ob');
+
 
 
 function [x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep)
