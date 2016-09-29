@@ -70,10 +70,9 @@ while ~isempty(seed_queue)
         [stream_xy, seed_idx] = get_streamline(xx, yy, uu, vv, seed_xy(ii,:), step_size);
         if size(stream_xy,1) < 2
             continue
-        end        
- 
-        % trim new streamline
-        % TODO: try computing distances at once, then triming rather than looping
+        end 
+         
+        % trim new streamline        
         for jj = seed_idx:size(stream_xy,1)
             [~, d_min] = nearestNeighbor(stream_tri, stream_xy(jj,:));
             if d_min < d_test
