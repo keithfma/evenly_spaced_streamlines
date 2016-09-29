@@ -62,6 +62,12 @@ end
 % add first stream line
 [x_line, y_line, ~] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
 
+% add first line to neighbor index
+k_line = xy_to_k(x_line, y_line);
+for kk = unique(k_line)'
+    nbr{kk} = [nbr{kk}; find(k_line==kk)];
+end
+
 % create seed point candidate queue
 x_queue = cell(0); 
 y_queue = cell(0);
