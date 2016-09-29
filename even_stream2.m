@@ -119,16 +119,17 @@ end
 
 %% prepare outputs
 
+% reformat stream line coordinates to NaN-separated vectors
 num_lines = length(start_idx);
-
-tmp = cell(num_lines,1);
+lines = cell(num_lines,1);
 for ii = 1:num_lines
-    tmp{ii} = [stream_tri.Points(start_idx(ii):stop_idx(ii), :); NaN, NaN];
+    lines{ii} = [stream_tri.Points(start_idx(ii):stop_idx(ii), :); NaN, NaN];
 end
-tmp = cell2mat(tmp);
+lines = cell2mat(lines);
+xs = lines(:,1); 
+ys = lines(:,2);
 
-xs = tmp(:,1); 
-ys = tmp(:,2);
+% TODO: compute distance to nearest and arclength
 ls = [];
 ds = [];
 
