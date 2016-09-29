@@ -109,6 +109,11 @@ while ~isempty(x_queue)
                 % add seed candidate points to queue
                 [x_queue{end+1}, y_queue{end+1}] = ...
                     get_seed_candidates(x_new, y_new, d_sep); %#ok!
+                % add streamline to neighbor index
+                k_new = xy_to_k(x_new, y_new);
+                for kk = unique(k_new)'
+                    nbr{kk} = [nbr{kk}; find(k_new==kk)+length(x_line)];
+                end
                 % add trimmed streamline to list
                 x_line = [x_line; NaN; x_new]; %#ok!
                 y_line = [y_line; NaN; y_new]; %#ok!
