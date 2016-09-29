@@ -1,5 +1,5 @@
 function [xs, ys, ds, ls] = ...
-    even_stream2(xx, yy, uu, vv, d_sep, d_test, step_size)
+    even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1).
 % Results can be used to plot using ____, ____, ...
