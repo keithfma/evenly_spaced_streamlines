@@ -76,21 +76,35 @@ y_queue = cell(0);
 
 %% main loop
 
+% TODO: merge x_ and y_ variables
+% TODO: dispense with helper functions
+
 d_sep_sq = d_sep*d_sep;
 d_test_sq = d_test*d_test;
 
 num_lines = 0;
 while ~isempty(x_queue)
+    
     % pop seed candidates from queue
     x_seed = x_queue{1}; x_queue(1) = [];
     y_seed = y_queue{1}; y_queue(1) = [];    
-    % check each candidate point in random order
+    
+    % check each seed candidate in random order
     for ii = randperm(length(x_seed))
-        if dist_gte(d_sep_sq, x_seed(ii), y_seed(ii), x_line, y_line)
-            % create new streamline
+        
+        % compute minimum distance to all streamline points
+        dxy = bsxfun(@minus, [x_seed(ii), y_seed(ii)],  [x_line, y_line]);
+        d_min_sq = min(sum(dxy.*dxy, 2));
+        
+        
+        % create new streamline
+        if d_min_sq >= d_sep_sq
+            
             [x_new, y_new, seed_idx] = get_streamline(...
                 xx, yy, uu, vv, x_seed(ii), y_seed(ii), step_size);
+            
             if ~isempty(x_new) 
+            
                 % trim new streamline
                 for kk = seed_idx:length(x_new)
                     if ~dist_gte(d_test_sq, x_new(kk), y_new(kk), x_line, y_line)
@@ -106,17 +120,21 @@ while ~isempty(x_queue)
                         break
                     end
                 end
+                
                 % add seed candidate points to queue
                 [x_queue{end+1}, y_queue{end+1}] = ...
                     get_seed_candidates(x_new, y_new, d_sep); %#ok!
+                
                 % add streamline to neighbor index
                 k_new = xy_to_k(x_new, y_new);
                 for kk = unique(k_new)'
                     nbr{kk} = [nbr{kk}; find(k_new==kk)+length(x_line)];
                 end
+                
                 % add trimmed streamline to list
                 x_line = [x_line; NaN; x_new]; %#ok!
                 y_line = [y_line; NaN; y_new]; %#ok!
+                
                 % tally and report
                 num_lines = num_lines+1;
                 fprintf('# streamlines: %d\n', num_lines);                
@@ -132,9 +150,9 @@ ys = y_line;
 ls = [];
 ds = [];
 
-%<DEBUG>
-keyboard
-%</DEBUG>
+% %<DEBUG>
+% keyboard
+% %</DEBUG>
 
 function [result] = dist_gte(d_min_sq, x_from, y_from, x_to, y_to)
 %
