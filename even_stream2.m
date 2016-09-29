@@ -53,20 +53,14 @@ while isnan(u0) || isnan(v0)
     v0 = interp2(xx, yy, vv, x0, y0);
 end
 
-% add first stream line
-[x_line, y_line, ~] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
+% add first stream line to triangulation
+[stream_xy, stream_idx] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
+stream_tri = delaunayTriangulation(stream_xy);
 
-% add first line to neighbor index
-k_line = xy_to_k(x_line, y_line);
-for kk = unique(k_line)'
-    nbr{kk} = [nbr{kk}; find(k_line==kk)];
-end
+% create seed point candidate queue 
+seed_queue{1} = get_seed_candidates(stream_xy, d_sep);
 
-% create seed point candidate queue
-x_queue = cell(0); 
-y_queue = cell(0);
-[x_queue{end+1}, y_queue{end+1}] = ...
-    get_seed_candidates(x_line, y_line, d_sep);
+keyboard
 
 %% main loop
 
@@ -163,27 +157,25 @@ function [result] = dist_gte(d_min_sq, x_from, y_from, x_to, y_to)
 dxy = bsxfun(@minus, [x_from, y_from],  [x_to, y_to]);
 result = min(sum(dxy.*dxy, 2)) >= d_min_sq;
 
-function [x_seed, y_seed] = get_seed_candidates(x_line, y_line, d_sep)
+function seed_xy = get_seed_candidates(xy, buf_dist)
 %
 % Compute the location of stream line seed point candidates that lie at a
-% distance d_sep along a normal vector at each point in x_line, y_line 
+% distance 'buf_dist' along a normal vector at each point in 'xy' 
 %
 % Arguments:
-%   x_line, y_line: Vectors, points along a streamline
-%   d_sep: Scalar, desired spacing between streamlines
-%   x_seed, y_seed: Vectors, canditate seed points
+%   xy: Matrix, [x,y] coordinates of points along a streamline in rows
+%   buf_dist: Scalar, buffer distance between xy and seed point candidates
+%   seed_xy, y_seed: Vectors, canditate seed points
+% %
 
 % get unit normal vectors at segment midpoints
-xy = [x_line, y_line];
 tangent = diff(xy);
 normal = [tangent(:,2), -tangent(:,1)];
 normal = bsxfun(@rdivide, normal, sqrt(sum(normal.*normal, 2)));
 midpoint = xy(1:end-1, :)+0.5*tangent;
 
-% get candidates offset d_sep in positive and negative normal direction
-seed = [midpoint+d_sep*normal; midpoint-d_sep*normal];
-x_seed = seed(:,1);
-y_seed = seed(:,2);
+% get candidates offset buf_dist in positive and negative normal direction
+seed_xy = [midpoint + buf_dist*normal; midpoint - buf_dist*normal];
 
 function [xy, seed_idx] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
 %
