@@ -1,29 +1,16 @@
-function [xs, ys, ds, ls] = ...
-    even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
+function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
+% function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
 %
-% Compute evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1).
-% Results can be used to plot using ____, ____, ...
+% Compute evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1)
 %
 % Arguments:
-%
-%   xx, yy:
-%
-%   uu, vv: 
-%
-%   d_sep:
-%
-%   d_test:
-%
-%   step_size: fraction of a cell (?)
-%
-%   xs, ys: Vectors, x-coord and y-coord for stream line points, individual
-%       lines are separated by NaNs
-%
-%   ds: Vector, distance to nearest neighboring streamline for stream line
-%       points, individual lines are separated by NaNs
-%
-%   ls: Vector, length along streamline for stream line points, individual
-%       lines are separated by NaNs
+%   xx, yy, uu, vv: Vector field x-coord, y-coord, vector x-component and
+%       vector y-component, respectively, sizes must match
+%   d_sep: Scalar, minimum distance between seed points and stream lines
+%   d_test: Scalar, minimum distance between stream lines
+%   step_size: Scalar, stream line step size as in the built-in stream2
+%   xy: Matrix, [x, y] for stream line points, each row is a point, 
+%       individual lines are separated by NaNs
 %  
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -32,6 +19,15 @@ function [xs, ys, ds, ls] = ...
 %   Boulogne-sur-Mer France, April 28--30, 1997 (pp. 43?55). inbook,
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
+
+% input sanity check
+validateattributes(xx, {'numeric'}, {'nonempty'}, mfilename, 'xx');
+validateattributes(yy, {'numeric'}, {'size', size(xx)}, mfilename, 'yy');
+validateattributes(uu, {'numeric'}, {'size', size(xx)}, mfilename, 'uu');
+validateattributes(vv, {'numeric'}, {'size', size(xx)}, mfilename, 'vv');
+validateattributes(d_sep, {'numeric'}, {'scalar', 'positive'}, mfilename, 'd_sep');
+validateattributes(d_test, {'numeric'}, {'scalar', 'positive', '<=', d_sep}, mfilename, 'd_test');
+validateattributes(step_size, {'numeric'}, {'scalar', 'positive'}, mfilename, 'step_size');
 
 % select random non-NaN grid point for initial seed
 while 1
@@ -97,7 +93,7 @@ while ~isempty(seed_queue)
     end
 end
 
-% extract line points and compute distance and arc length
+% extract stream line points for output as xy 
 num_lines = length(stream_len);
 stream_data = cell(num_lines, 1);
 for ii = 1:num_lines
