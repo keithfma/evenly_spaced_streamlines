@@ -33,13 +33,23 @@ function [xs, ys, ls, ds] = ...
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-%% get initial streamline
+%% initialize
+
+% gather some basic coordinate info
+x_min = min(xx(:));
+x_max = max(xx(:));
+x_rng = x_max-x_min; 
+y_min = min(yy(:));
+y_max = max(yy(:));
+y_rng = y_max-y_min;
+
+% initialize neighbor index grid and function to convert coords to indices
+nrow_nbr = max( floor(1+(yy(:)-y_min)/d_sep) );
+ncol_nbr = max( floor(1+(xx(:)-x_min)/d_sep) );
+xy_to_k = @(x, y) 1+floor((y-y_min)/d_sep) + floor((x-x_min)/d_sep)*nrow_nbr; 
+nbr = cell(nrow_nbr*ncol_nbr, 1); % shape as vector, useful with cell2mat() later
 
 % get seed point at random (populated) point
-x_min = min(xx(:));
-x_rng = range(xx(:)); 
-y_min = min(yy(:));
-y_rng = range(yy(:));
 u0 = NaN;
 v0 = NaN;
 while isnan(u0) || isnan(v0)
