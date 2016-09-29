@@ -33,27 +33,14 @@ function [xs, ys, ds, ls] = ...
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-%% initialize
-
-% gather some basic coordinate info
-x_min = min(xx(:));
-x_max = max(xx(:));
-x_rng = x_max-x_min; 
-y_min = min(yy(:));
-y_max = max(yy(:));
-y_rng = y_max-y_min;
-
-% get seed point at random (non-NaN) point
-% TODO: simplify by using a given grid point
-u0 = NaN;
-v0 = NaN;
-while isnan(u0) || isnan(v0)
-    x0 = x_min+rand(1)*x_rng;
-    y0 = y_min+rand(1)*y_rng;
-    u0 = interp2(xx, yy, uu, x0, y0);
-    v0 = interp2(xx, yy, vv, x0, y0);
+% select random non-NaN grid point for initial seed
+while 1
+  kk = randi([1, numel(xx)]);
+  if ~isnan(uu(kk)) && ~isnan(vv(kk))
+      break
+  end
 end
-seed_xy = [x0, y0];
+seed_xy = [xx(kk), yy(kk)];
 
 % add first streamline to triangulation and length list
 [stream_xy, ~] = get_streamline(xx, yy, uu, vv, seed_xy, step_size);
@@ -63,8 +50,7 @@ stream_len = size(stream_xy,1);
 % create seed point candidate queue 
 seed_queue{1} = get_seed_candidates(stream_xy, d_sep);
 
-%% main loop
-
+% check all seed candidates
 while ~isempty(seed_queue)
     
     % pop seed candidates from queue
@@ -112,8 +98,6 @@ while ~isempty(seed_queue)
     end
 end
 
-%% prepare outputs
-
 % extract line points and compute distance and arc length
 num_lines = length(stream_len);
 stream_data = cell(num_lines, 1);
@@ -153,6 +137,7 @@ midpoint = xy(1:end-1, :)+0.5*tangent;
 
 % get candidates offset buf_dist in positive and negative normal direction
 seed_xy = [midpoint + buf_dist*normal; midpoint - buf_dist*normal];
+
 
 function [stream_xy, seed_idx] = get_streamline(xx, yy, uu, vv, seed_xy, step_size)
 %
