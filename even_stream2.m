@@ -89,7 +89,7 @@ while ~isempty(seed_queue)
         stream_xy = stream_xy(kk:jj, :);
         
         % add streamline to triangulation and line length list
-        stream_tri.Points = [stream_tri.Points; stream_xy]; % TODO: use length to append?
+        stream_tri.Points = [stream_tri.Points; stream_xy];
         stream_len(end+1) = size(stream_xy, 1); %#ok!
          
         % add seed candidate points to queue
@@ -107,7 +107,7 @@ for ii = 1:num_lines
     [~, stream_d] = nearestNeighbor(stream_tri, stream_xy);
     stream_l = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
     stream_data{ii} = [stream_xy, stream_d, stream_l; nan(1,4)];    
-    stream_tri.Points = [stream_tri.Points; stream_xy]; % TODO: use length to append?
+    stream_tri.Points = [stream_tri.Points; stream_xy]; 
 end
 
 % concatenate and split stream data into NaN-separated vectors
