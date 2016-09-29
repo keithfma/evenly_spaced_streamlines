@@ -44,6 +44,7 @@ y_max = max(yy(:));
 y_rng = y_max-y_min;
 
 % get seed point at random (non-NaN) point
+% TODO: simplify by using a given grid point
 u0 = NaN;
 v0 = NaN;
 while isnan(u0) || isnan(v0)
@@ -52,110 +53,91 @@ while isnan(u0) || isnan(v0)
     u0 = interp2(xx, yy, uu, x0, y0);
     v0 = interp2(xx, yy, vv, x0, y0);
 end
+seed_xy = [x0, y0];
 
-% add first stream line to triangulation
-[stream_xy, stream_idx] = get_streamline(xx, yy, uu, vv, x0, y0, step_size);
+% add first streamline to triangulation and line start-stop index lists
+[stream_xy, ~] = get_streamline(xx, yy, uu, vv, seed_xy, step_size);
+start_idx = 1;
+stop_idx = size(stream_xy,1);
 stream_tri = delaunayTriangulation(stream_xy);
 
 % create seed point candidate queue 
 seed_queue{1} = get_seed_candidates(stream_xy, d_sep);
 
-keyboard
-
 %% main loop
 
-% TODO: merge x_ and y_ variables
-% TODO: dispense with helper functions
-
-d_sep_sq = d_sep*d_sep;
-d_test_sq = d_test*d_test;
-
-num_lines = 0;
-while ~isempty(x_queue)
+while ~isempty(seed_queue)
     
     % pop seed candidates from queue
-    x_seed = x_queue{1}; x_queue(1) = [];
-    y_seed = y_queue{1}; y_queue(1) = [];    
+    seed_xy = seed_queue{1}; 
+    seed_queue(1) = []; 
     
     % check each seed candidate in random order
-    for ii = randperm(length(x_seed))
+    for ii = randperm(length(seed_xy))
         
-        % compute minimum distance to all streamline points
-        dxy = bsxfun(@minus, [x_seed(ii), y_seed(ii)],  [x_line, y_line]);
-        d_min_sq = min(sum(dxy.*dxy, 2));
-        
-        
-        % create new streamline
-        if d_min_sq >= d_sep_sq
-            
-            [x_new, y_new, seed_idx] = get_streamline(...
-                xx, yy, uu, vv, x_seed(ii), y_seed(ii), step_size);
-            
-            if ~isempty(x_new) 
-            
-                % trim new streamline
-                for kk = seed_idx:length(x_new)
-                    if ~dist_gte(d_test_sq, x_new(kk), y_new(kk), x_line, y_line)
-                        x_new(kk:end) = [];
-                        y_new(kk:end) = [];
-                        break
-                    end
-                end
-                for kk = seed_idx:-1:1
-                    if ~dist_gte(d_test_sq, x_new(kk), y_new(kk), x_line, y_line)
-                        x_new(1:kk) = [];
-                        y_new(1:kk) = [];
-                        break
-                    end
-                end
+        % skip if candidate istoo close to any streamline point
+        [~, d_min] = nearestNeighbor(stream_tri, seed_xy(ii,:));
+        if d_min < d_sep
+            continue
+        end
                 
-                % add seed candidate points to queue
-                [x_queue{end+1}, y_queue{end+1}] = ...
-                    get_seed_candidates(x_new, y_new, d_sep); %#ok!
-                
-                % add streamline to neighbor index
-                k_new = xy_to_k(x_new, y_new);
-                for kk = unique(k_new)'
-                    nbr{kk} = [nbr{kk}; find(k_new==kk)+length(x_line)];
-                end
-                
-                % add trimmed streamline to list
-                x_line = [x_line; NaN; x_new]; %#ok!
-                y_line = [y_line; NaN; y_new]; %#ok!
-                
-                % tally and report
-                num_lines = num_lines+1;
-                fprintf('# streamlines: %d\n', num_lines);                
+        % create new streamline, skip if empty
+        [stream_xy, seed_idx] = get_streamline(xx, yy, uu, vv, seed_xy(ii,:), step_size);
+        if size(stream_xy,1) < 2
+            continue
+        end        
+ 
+        % trim new streamline
+        % TODO: try computing distances at once, then triming rather than looping
+        for jj = seed_idx:size(stream_xy,1)
+            [~, d_min] = nearestNeighbor(stream_tri, stream_xy(jj,:));
+            if d_min < d_test
+                break
             end
         end
+        for kk = seed_idx:-1:1
+            [~, d_min] = nearestNeighbor(stream_tri, stream_xy(kk,:));
+            if d_min < d_test
+                break
+            end
+        end
+        stream_xy = stream_xy(kk:jj, :);
+        
+        % add streamline to triangulation and line start index list
+        start_idx(end+1) = stop_idx(end)+1; %#ok!
+        stream_tri.Points = [stream_tri.Points; stream_xy]; 
+        stop_idx(end+1) = size(stream_tri.Points, 1); %#ok!
+         
+        % add seed candidate points to queue
+        seed_queue{end+1}  = get_seed_candidates(stream_xy, d_sep); %#ok!
+                
+        % report
+        fprintf('%d streamlines\n', length(start_idx));
+
     end
 end
 
 %% prepare outputs
 
-xs = x_line; 
-ys = y_line;
+num_lines = length(start_idx);
+
+tmp = cell(num_lines,1);
+for ii = 1:num_lines
+    tmp{ii} = [stream_tri.Points(start_idx(ii):stop_idx(ii), :); NaN, NaN];
+end
+tmp = cell2mat(tmp);
+
+xs = tmp(:,1); 
+ys = tmp(:,2);
 ls = [];
 ds = [];
 
 %<DEBUG>
+hold off
+plot(xs, ys);
 keyboard
 %</DEBUG>
 
-function [result] = dist_gte(d_min_sq, x_from, y_from, x_to, y_to)
-%
-% Return TRUE if minimum distance between the point (x_from, y_from) and 
-% all points in (x_to, y_to) is greater than or equal to d_min_sq, else 
-% return FALSE
-%
-% Arguments:
-%   x_from, y_from: Scalars, single point to compute distance from
-%   x_to, y_to: Vectors, many points to compute distance to
-%   d_min: Scalar, mininum distance
-% %
-
-dxy = bsxfun(@minus, [x_from, y_from],  [x_to, y_to]);
-result = min(sum(dxy.*dxy, 2)) >= d_min_sq;
 
 function seed_xy = get_seed_candidates(xy, buf_dist)
 %
@@ -177,52 +159,37 @@ midpoint = xy(1:end-1, :)+0.5*tangent;
 % get candidates offset buf_dist in positive and negative normal direction
 seed_xy = [midpoint + buf_dist*normal; midpoint - buf_dist*normal];
 
-function [xy, seed_idx] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
+function [stream_xy, seed_idx] = get_streamline(xx, yy, uu, vv, seed_xy, step_size)
 %
-% Compute streamline in both directions starting at x0, y0
+% Compute streamline in both directions starting at seed point
 %
 % Arguments: 
-%   See documentation for stream2 for input argument definitions
-%   xy : Matrix, stream line x- and y-coordinates in rows, returns [] if
+%   xx, yy:
+%   uu, vv:
+%   seed_xy: Vector, [x, y] coordinates of seed point
+%   stream_xy : Matrix, stream line x- and y-coordinates in rows, returns [] if
 %       stream line has zero length
 %   seed_idx: Scalar, index of seed point in output streamline
 % %
 
-fwd = stream2(xx, yy, uu, vv, x0, y0, step_size);
+fwd = stream2(xx, yy, uu, vv, seed_xy(1), seed_xy(2), step_size);
 xy_fwd = fwd{1}(~any(isnan(fwd{1}), 2), :); % drop NaN rows
 has_fwd = size(xy_fwd,1) > 1;
 
-rev = stream2(xx, yy, -uu, -vv, x0, y0, step_size);
+rev = stream2(xx, yy, -uu, -vv, seed_xy(1), seed_xy(2), step_size);
 xy_rev = rev{1}(~any(isnan(rev{1}), 2), :); % drop NaN rows
 has_rev = size(xy_rev,1) > 1;
 
 if has_fwd && has_rev
-    xy = [xy_rev(end:-1:2, :); xy_fwd];
+    stream_xy = [xy_rev(end:-1:2, :); xy_fwd];
     seed_idx = size(xy_rev,1);
 elseif has_rev
-    xy = xy_rev;
+    stream_xy = xy_rev;
     seed_idx = 1;
 elseif has_fwd
-    xy = xy_fwd;
+    stream_xy = xy_fwd;
     seed_idx = 1;
 else
-    xy = [];
+    stream_xy = [];
     seed_idx = [];
 end
-
-% %<DEBUG>
-% if any(isnan(xs)) || any(isnan(ys))
-%     fprintf('NaN in streamline - debugging\n');
-%     keyboard
-% end
-% %</DEBUG>
-
-% %<DEBUG>
-% if ~isempty(i0)
-%     % i0 = i0+1; % fails, which is good
-%     fprintf('x: %g\n', xs(i0)-x0);
-%     assert(abs(xs(i0)-x0) < 1e-15, 'seed index is incorrect');
-%     fprintf('y: %g\n', ys(i0)-y0);
-%     assert(abs(ys(i0)-y0) < 1e-15, 'seed index is incorrect');
-% end
-% %</DEBUG>
