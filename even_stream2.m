@@ -43,13 +43,7 @@ y_min = min(yy(:));
 y_max = max(yy(:));
 y_rng = y_max-y_min;
 
-% initialize neighbor index grid and function to convert coords to indices
-nrow_nbr = max( floor(1+(yy(:)-y_min)/d_sep) );
-ncol_nbr = max( floor(1+(xx(:)-x_min)/d_sep) );
-xy_to_k = @(x, y) 1+floor((y-y_min)/d_sep) + floor((x-x_min)/d_sep)*nrow_nbr; 
-nbr = cell(nrow_nbr*ncol_nbr, 1); % shape as vector, useful with cell2mat() later
-
-% get seed point at random (populated) point
+% get seed point at random (non-NaN) point
 u0 = NaN;
 v0 = NaN;
 while isnan(u0) || isnan(v0)
@@ -150,9 +144,9 @@ ys = y_line;
 ls = [];
 ds = [];
 
-% %<DEBUG>
-% keyboard
-% %</DEBUG>
+%<DEBUG>
+keyboard
+%</DEBUG>
 
 function [result] = dist_gte(d_min_sq, x_from, y_from, x_to, y_to)
 %
@@ -191,15 +185,15 @@ seed = [midpoint+d_sep*normal; midpoint-d_sep*normal];
 x_seed = seed(:,1);
 y_seed = seed(:,2);
 
-function [xs, ys, i0] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
+function [xy, seed_idx] = get_streamline(xx, yy, uu, vv, x0, y0, step_size)
 %
 % Compute streamline in both directions starting at x0, y0
 %
 % Arguments: 
 %   See documentation for stream2 for input argument definitions
-%   xs, ys : Vectors, stream line x- and y-coordinates, returns [] if
+%   xy : Matrix, stream line x- and y-coordinates in rows, returns [] if
 %       stream line has zero length
-%   i0: Scalar, index of seed point in output streamline
+%   seed_idx: Scalar, index of seed point in output streamline
 % %
 
 fwd = stream2(xx, yy, uu, vv, x0, y0, step_size);
@@ -211,21 +205,17 @@ xy_rev = rev{1}(~any(isnan(rev{1}), 2), :); % drop NaN rows
 has_rev = size(xy_rev,1) > 1;
 
 if has_fwd && has_rev
-    xs = [xy_rev(end:-1:2, 1); xy_fwd(:, 1)];
-    ys = [xy_rev(end:-1:2, 2); xy_fwd(:, 2)];
-    i0 = size(xy_rev,1);
+    xy = [xy_rev(end:-1:2, :); xy_fwd];
+    seed_idx = size(xy_rev,1);
 elseif has_rev
-    xs = xy_rev(:,1);
-    ys = xy_rev(:,2);
-    i0 = 1;
+    xy = xy_rev;
+    seed_idx = 1;
 elseif has_fwd
-    xs = xy_fwd(:,1);
-    ys = xy_fwd(:,2);
-    i0 = 1;
+    xy = xy_fwd;
+    seed_idx = 1;
 else
-    xs = [];
-    ys = [];
-    i0 = [];
+    xy = [];
+    seed_idx = [];
 end
 
 % %<DEBUG>
