@@ -19,12 +19,15 @@ d_sep = 0.05*range(vv);
 d_test = 0.5*d_sep;
 step_size = 0.1;
 
-[xs, ys, ls, ds] = even_stream2(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
 
-%<DEBUG>
-hold off
-% imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz, 'AlphaData', ~isnan(zz));
-% hold on
-plot(xs, ys, '-k');
-%</DEBUG>
+% [xs, ys        ] = even_stream2(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
+[xs, ys, ls    ] = even_stream2(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
+% [xs, ys, ls, ds] = even_stream2(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
+
+% %<DEBUG>
+% hold off
+% % imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz, 'AlphaData', ~isnan(zz));
+% % hold on
+% plot(xs, ys, '-k');
+% %</DEBUG>
 

@@ -1,4 +1,4 @@
-function [xs, ys, ds, ls] = ...
+function [xs, ys, ls, ds] = ...
     even_stream2(xx, yy, uu, vv, d_sep, d_test, step_size)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1).
@@ -97,25 +97,46 @@ while ~isempty(seed_queue)
     end
 end
 
-% extract line points and compute distance and arc length
+% determine which outputs are required
+if nargout >= 3
+    want_ls = true;
+else
+    want_ls = false;
+    stream_l = [];
+end
+if nargout == 4
+    want_ds = true;
+else
+    want_ds = false;
+    stream_d = [];
+end
+
+% extract/compute output data
 num_lines = length(stream_len);
 stream_data = cell(num_lines, 1);
 for ii = 1:num_lines
-    stream_xy = stream_tri.Points(1:stream_len(ii), :);    
-    stream_tri.Points(1:stream_len(ii), :) = [];    
-    [~, stream_d] = nearestNeighbor(stream_tri, stream_xy);
-    stream_l = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
-    stream_data{ii} = [stream_xy, stream_d, stream_l; nan(1,4)];    
-    stream_tri.Points = [stream_tri.Points; stream_xy]; 
+    stream_xy = stream_tri.Points(1:stream_len(ii), :); 
+    stream_tri.Points(1:stream_len(ii), :) = [];
+        if want_ls % compute arc length    
+        stream_l = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
+    end
+    if want_ds % compute distance to neighbors, and re-append line       
+        [~, stream_d] = nearestNeighbor(stream_tri, stream_xy);
+        stream_tri.Points = [stream_tri.Points; stream_xy];
+    end
+    stream_data{ii} = [stream_xy, stream_l, stream_d; nan(1,nargout)];        
 end
 
 % concatenate and split stream data into NaN-separated vectors
 stream_data = cell2mat(stream_data);
 xs = stream_data(:,1);
 ys = stream_data(:,2);
-ds = stream_data(:,3);
-ls = stream_data(:,4);
-
+if want_ls
+    ls = stream_data(:,3);
+end
+if want_ds
+    ds = stream_data(:,4);
+end
 
 function seed_xy = get_seed_candidates(xy, buf_dist)
 %
