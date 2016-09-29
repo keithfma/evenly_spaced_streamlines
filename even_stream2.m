@@ -1,4 +1,4 @@
-function [xs, ys, ls, ds] = ...
+function [xs, ys, ds, ls] = ...
     even_stream2(xx, yy, uu, vv, d_sep, d_test, step_size)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1).
@@ -14,16 +14,16 @@ function [xs, ys, ls, ds] = ...
 %
 %   d_test:
 %
-%   step_size:
+%   step_size: fraction of a cell (?)
 %
 %   xs, ys: Vectors, x-coord and y-coord for stream line points, individual
 %       lines are separated by NaNs
 %
-%   ls: Vector, length along streamline for stream line points, individual
-%       lines are separated by NaNs
-%
 %   ds: Vector, distance to nearest neighboring streamline for stream line
 %       points, individual lines are separated by NaNs
+%
+%   ls: Vector, length along streamline for stream line points, individual
+%       lines are separated by NaNs
 %  
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -55,11 +55,10 @@ while isnan(u0) || isnan(v0)
 end
 seed_xy = [x0, y0];
 
-% add first streamline to triangulation and line start-stop index lists
+% add first streamline to triangulation and length list
 [stream_xy, ~] = get_streamline(xx, yy, uu, vv, seed_xy, step_size);
-start_idx = 1;
-stop_idx = size(stream_xy,1);
 stream_tri = delaunayTriangulation(stream_xy);
+stream_len = size(stream_xy,1);
 
 % create seed point candidate queue 
 seed_queue{1} = get_seed_candidates(stream_xy, d_sep);
@@ -103,41 +102,36 @@ while ~isempty(seed_queue)
         end
         stream_xy = stream_xy(kk:jj, :);
         
-        % add streamline to triangulation and line start index list
-        start_idx(end+1) = stop_idx(end)+1; %#ok!
-        stream_tri.Points = [stream_tri.Points; stream_xy]; 
-        stop_idx(end+1) = size(stream_tri.Points, 1); %#ok!
+        % add streamline to triangulation and line length list
+        stream_tri.Points = [stream_tri.Points; stream_xy]; % TODO: use length to append?
+        stream_len(end+1) = size(stream_xy, 1); %#ok!
          
         % add seed candidate points to queue
         seed_queue{end+1}  = get_seed_candidates(stream_xy, d_sep); %#ok!
-                
-        % report
-        fprintf('%d streamlines\n', length(start_idx));
 
     end
 end
 
 %% prepare outputs
 
-% reformat stream line coordinates to NaN-separated vectors
-num_lines = length(start_idx);
-lines = cell(num_lines,1);
+% extract line points and compute distance and arc length
+num_lines = length(stream_len);
+stream_data = cell(num_lines, 1);
 for ii = 1:num_lines
-    lines{ii} = [stream_tri.Points(start_idx(ii):stop_idx(ii), :); NaN, NaN];
+    stream_xy = stream_tri.Points(1:stream_len(ii), :);    
+    stream_tri.Points(1:stream_len(ii), :) = [];    
+    [~, stream_d] = nearestNeighbor(stream_tri, stream_xy);
+    stream_l = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
+    stream_data{ii} = [stream_xy, stream_d, stream_l; nan(1,4)];    
+    stream_tri.Points = [stream_tri.Points; stream_xy]; % TODO: use length to append?
 end
-lines = cell2mat(lines);
-xs = lines(:,1); 
-ys = lines(:,2);
 
-% TODO: compute distance to nearest and arclength
-ls = [];
-ds = [];
-
-%<DEBUG>
-hold off
-plot(xs, ys);
-keyboard
-%</DEBUG>
+% concatenate and split stream data into NaN-separated vectors
+stream_data = cell2mat(stream_data);
+xs = stream_data(:,1);
+ys = stream_data(:,2);
+ds = stream_data(:,3);
+ls = stream_data(:,4);
 
 
 function seed_xy = get_seed_candidates(xy, buf_dist)
