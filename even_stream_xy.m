@@ -25,10 +25,6 @@ function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
 if nargin < 8; verbose = false; end
 sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size);
 
-if verbose
-    fprintf('%s: start\n', mfilename);
-end
-
 % disable nuisance warning(s)
 % ...Delaunay triangulation drops duplicate points from streamlines, OK
 warning('off', 'MATLAB:delaunayTriangulation:DupPtsWarnId'); 
@@ -49,10 +45,6 @@ stream_len = size(stream_tri.Points,1);
 
 % create seed point candidate queue 
 seed_queue{1} = get_seed_candidates(stream_xy, d_sep);
-
-if verbose
-    fprintf('%s: start main loop\n', mfilename);
-end
 
 % check all seed candidates
 while ~isempty(seed_queue)
@@ -112,10 +104,6 @@ while ~isempty(seed_queue)
     end
 end
 
-if verbose
-    fprintf('%s: completed main loop\n', mfilename);
-end
-
 % extract stream line points for output as xy 
 num_pts = size(stream_tri.Points, 1);
 num_lines = length(stream_len);
@@ -132,10 +120,6 @@ end
 
 % enable nuisance warning(s)
 warning('on', 'MATLAB:delaunayTriangulation:DupPtsWarnId'); 
-
-if verbose
-    fprintf('%s: completed\n', mfilename);
-end
 
 function [] = sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size)
 % function [] = sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size)
