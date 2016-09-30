@@ -29,6 +29,10 @@ if verbose
     fprintf('%s: start\n', mfilename);
 end
 
+% disable nuisance warning(s)
+% ...Delaunay triangulation drops duplicate points from streamlines, OK
+warning('off', 'MATLAB:delaunayTriangulation:DupPtsWarnId'); 
+
 % select random non-NaN grid point for initial seed
 while 1
   kk = randi([1, numel(xx)]);
@@ -88,8 +92,9 @@ while ~isempty(seed_queue)
         stream_xy = stream_xy(kk:jj, :);
         
         % add streamline to triangulation and line length list
+        len0 = size(stream_tri.Points, 1);
         stream_tri.Points = [stream_tri.Points; stream_xy];
-        stream_len(end+1) = size(stream_xy, 1); %#ok!
+        stream_len(end+1) = size(stream_tri.Points, 1)-len0; %#ok!
          
         % add seed candidate points to queue
         seed_queue{end+1}  = get_seed_candidates(stream_xy, d_sep); %#ok!
@@ -124,6 +129,9 @@ for kk = 1:num_lines
     ii0 = ii1+1;
     jj0 = jj1+2;
 end
+
+% enable nuisance warning(s)
+warning('on', 'MATLAB:delaunayTriangulation:DupPtsWarnId'); 
 
 if verbose
     fprintf('%s: completed\n', mfilename);
