@@ -8,8 +8,13 @@ function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
 %       vector y-component, respectively, sizes must match
 %   d_sep: Scalar, minimum distance between seed points and stream lines
 %   d_test: Scalar, minimum distance between stream lines
-%   step_size: Scalar, stream line step size as in the built-in stream2
-%   verbose: Scalar, set to True to enable verbose progress messages
+%
+% Optional Parameters (Name - Value):
+%   'StepSize': stream line step size as in the built-in stream2
+%   'Verbose': set true to enable verbose progress messages
+%   'LineStyle': line style as in the built-in plot()
+%   'LineWidth': line width as in the built-in plot()
+%   'Color': line color as in the built-in plot()
 %  
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -20,17 +25,29 @@ function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
 % %
 
 % handle inputs
+% NOTE: sanity checks are defered to child functions
 parser = inputParser;
 parser.CaseSensitive = false;
 parser.PartialMatching = false;
 parser.KeepUnmatched = false;
 
+parser.addParameter('stepsize', 0.1);
 parser.addParameter('verbose', false);
+parser.addParameter('LineStyle', '-');
+parser.addParameter('LineWidth', 0.5);
+parser.addParameter('Color', 'b');
 
 parser.parse(varargin{:});
+step_size = parser.Results.stepsize;
 verbose = parser.Results.verbose;
+line_style = parser.Results.LineStyle;
+line_width = parser.Results.LineWidth;
+line_color = parser.Results.Color;
 
 %<DEBUG>
+disp(step_size);
 disp(verbose);
+disp(line_style);
+disp(line_width);
+disp(line_color);
 %</DEBUG>
-
