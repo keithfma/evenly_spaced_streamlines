@@ -19,8 +19,9 @@ zz = xx .* exp(-xx.^2 - yy.^2);
 d_sep = 0.05*range(vv);
 d_test = 0.5*d_sep;
 step_size = 0.1;
+verbose = true;
 
-xy = even_stream_xy(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
+xy = even_stream_xy(xx, yy, dzdx, dzdy, d_sep, d_test, step_size, verbose);
 
 %<DEBUG>
 hold off

@@ -1,5 +1,5 @@
-function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
-% function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
+function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
+% function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %
@@ -9,6 +9,7 @@ function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
 %   d_sep: Scalar, minimum distance between seed points and stream lines
 %   d_test: Scalar, minimum distance between stream lines
 %   step_size: Scalar, stream line step size as in the built-in stream2
+%   verbose: Scalar, set to True to enable verbose progress messages
 %   xy: Matrix, [x, y] for stream line points, each row is a point, 
 %       individual lines are separated by NaNs
 %  
@@ -20,6 +21,8 @@ function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
+% check inputs
+if nargin < 8; verbose = false; end
 sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size);
 
 % select random non-NaN grid point for initial seed
@@ -84,6 +87,17 @@ while ~isempty(seed_queue)
         seed_queue{end+1}  = get_seed_candidates(stream_xy, d_sep); %#ok!
 
     end
+    
+    if verbose
+        num_lines = length(stream_len);
+        num_seeds = 0;
+        for pp = 1:length(seed_queue)
+            num_seeds = num_seeds+length(seed_queue{pp});
+        end
+        fprintf('%s: %d lines, %d seed candidates\n', ...
+            mfilename, num_lines, num_seeds);
+    end
+    
 end
 
 % extract stream line points for output as xy 
