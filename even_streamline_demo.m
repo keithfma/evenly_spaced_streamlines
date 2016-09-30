@@ -22,8 +22,11 @@ step_size = 0.1;
 hold off
 %</DEBUG>
 
-hh = even_streamline(xx, yy, dzdx, dzdy, d_sep, d_test, ...
-    'color', 'r', 'linewidth', 2, 'verbose', 1);
+% hh = even_streamline(xx, yy, dzdx, dzdy, d_sep, d_test, ...
+%     'Color', 'r', 'LineWidth', 2, 'Verbose', 1);
+
+hh = even_streamline_taper(xx, yy, dzdx, dzdy, d_sep, d_test, ...
+    'Color', 'r', 'LineWidthMin', 0.5, 'LineWidthMax', 2, 'Verbose', 1);
 
 %<DEBUG>
 %</DEBUG>

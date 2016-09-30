@@ -10,11 +10,11 @@ function hh = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
 %   d_test: Scalar, minimum distance between stream lines
 %
 % Optional Parameters (Name - Value):
-%   'StepSize': stream line step size as in the built-in stream2
-%   'Verbose': set true to enable verbose progress messages
-%   'LineStyle': line style as in the built-in plot()
-%   'LineWidth': line width as in the built-in plot()
-%   'Color': line color as in the built-in plot()
+%   'StepSize': stream line step size as in the built-in stream2, default = 0.1
+%   'Verbose': set true to enable verbose messages, default = false
+%   'LineStyle': line style as in the built-in plot(), default = '-'
+%   'LineWidth': line width as in the built-in plot(), default = 0.5
+%   'Color': line color as in the built-in plot(), default = 'b'
 %
 % Returns:
 %   hh = Graphics object for streamlines
