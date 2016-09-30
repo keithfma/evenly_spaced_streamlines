@@ -1,4 +1,5 @@
 function len = even_stream_len(xy)
+% function len = even_stream_len(xy)
 %
 % Return arc length of streamlines created with the even_stream_xy fuction.
 % This step is part of the Jobar & Lefer [1] algorithm to plot evenly
