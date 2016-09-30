@@ -1,5 +1,5 @@
-function len = even_stream_len(xy)
-% function len = even_stream_len(xy)
+function len = even_stream_len(xy, verbose)
+% function len = even_stream_len(xy, verbose)
 %
 % Return arc length of streamlines created with the even_stream_xy fuction.
 % This step is part of the Jobar & Lefer [1] algorithm to plot evenly
@@ -9,6 +9,7 @@ function len = even_stream_len(xy)
 %   xy = Matrix, evenly-spaced streamlines, as created by the
 %       even_stream_xy function, with [x,y] points in rows, and lines
 %       separated by NaNs
+%   verbose: Scalar, set to True to enable verbose progress messages
 %   len = Vector, arc length (distance along the line) for all stream line
 %       points in xy
 %
@@ -29,6 +30,9 @@ num_lines = length(start_idx);
 % compute arclength for each streamline
 len = nan(size(xy,1), 1);
 for ii = 1:num_lines
+    if verbose
+        fprintf('%s: line %d of %d\n', mfilename, ii, num_lines);
+    end
     stream_xy = xy(start_idx(ii):stop_idx(ii), :);
     stream_len = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
     len(start_idx(ii):stop_idx(ii)) = stream_len;

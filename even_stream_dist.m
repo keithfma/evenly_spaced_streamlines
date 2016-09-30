@@ -1,5 +1,5 @@
-function dist = even_stream_dist(xy)
-% function dist = even_stream_dist(xy)
+function dist = even_stream_dist(xy, verbose)
+% function dist = even_stream_dist(xy, verbose)
 %
 % Return minimum distance to neighboring streamlines for streamlines
 % created with the even_stream_xy fuction. This step is part of the Jobar &
@@ -9,6 +9,7 @@ function dist = even_stream_dist(xy)
 %   xy = Matrix, evenly-spaced streamlines, as created by the
 %       even_stream_xy function, with [x,y] points in rows, and lines
 %       separated by NaNs
+%   verbose: Scalar, set to True to enable verbose progress messages
 %   dist = Vector, minimum distance to neighboring stream lines for all
 %       points in xy
 %
@@ -34,6 +35,9 @@ tri = delaunayTriangulation(xy(is_pt,1), xy(is_pt,2));
 % compute dist for points in each line using triangulation
 dist = nan(size(xy, 1), 1);
 for ii = 1:num_lines
+    if verbose
+        fprintf('%s: line %d of %d\n', mfilename, ii, num_lines);
+    end
     stream_xy = tri.Points(1:len(ii), :);    
     tri.Points(1:len(ii), :) = [];    
     [~, stream_dist] = nearestNeighbor(tri, stream_xy);       
