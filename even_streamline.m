@@ -1,5 +1,5 @@
-function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
-% function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
+function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
+% function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %
@@ -19,4 +19,18 @@ function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-error('%s not implemented', mfilename);
+% handle inputs
+parser = inputParser;
+parser.CaseSensitive = false;
+parser.PartialMatching = false;
+parser.KeepUnmatched = false;
+
+parser.addParameter('verbose', false);
+
+parser.parse(varargin{:});
+verbose = parser.Results.verbose;
+
+%<DEBUG>
+disp(verbose);
+%</DEBUG>
+
