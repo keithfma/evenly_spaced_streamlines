@@ -24,20 +24,7 @@ sep_idx = find(isnan(xy(:,1)));
 start_idx = [1; sep_idx+1];
 stop_idx = [sep_idx-1; size(xy,1)];
 
-%<DEBUG> confirm that index selection works as expected
-
-% plot original lines in blue
-figure 
-plot(xy(:,1), xy(:,2), '-b');
-
-% plot again using start and stop indices explicitly
-hold on
-for ii = 1:length(start_idx)
-    plot(xy(start_idx(ii):stop_idx(ii), 1), xy(start_idx(ii):stop_idx(ii), 2), '-r');
-end
-
-keyboard
-
+%<DEBUG> 
 %</DEBUG>
 
 % OLD CODE FOR REFERENCE
