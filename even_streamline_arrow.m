@@ -69,4 +69,11 @@ hl = plot(xy(:,1), xy(:,2), ...
     'LineStyle', line_style, 'LineWidth', line_width, 'Color', line_color);
 
 % TODO: plot arrows
+x_arrow = [xy(head_spc:head_spc:end, 1), xy(1+head_spc:head_spc:end, 1)];
+y_arrow = [xy(head_spc:head_spc:end, 2), xy(1+head_spc:head_spc:end, 2)];
+nan_arrow = any(isnan(x_arrow), 2) | any(isnan(y_arrow), 2);
+x_arrow = x_arrow(~nan_arrow, :);
+y_arrow = y_arrow(~nan_arrow, :);
+keyboard
 ha = [];
+
