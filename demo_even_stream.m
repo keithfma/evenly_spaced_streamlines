@@ -23,10 +23,10 @@ verbose = true;
 
 xy = even_stream_xy(xx, yy, dzdx, dzdy, d_sep, d_test, step_size, verbose);
 
-%<DEBUG>
-hold off
-% imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz, 'AlphaData', ~isnan(zz));
-% hold on
-plot(xy(:,1), xy(:,2), '-k');
-%</DEBUG>
+% %<DEBUG>
+% hold off
+% % imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz, 'AlphaData', ~isnan(zz));
+% % hold on
+% plot(xy(:,1), xy(:,2), '-k');
+% %</DEBUG>
 

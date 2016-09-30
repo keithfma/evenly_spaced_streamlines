@@ -25,6 +25,10 @@ function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
 if nargin < 8; verbose = false; end
 sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size);
 
+if verbose
+    fprintf('%s: start\n', mfilename);
+end
+
 % select random non-NaN grid point for initial seed
 while 1
   kk = randi([1, numel(xx)]);
@@ -37,10 +41,14 @@ seed_xy = [xx(kk), yy(kk)];
 % add first streamline to triangulation and length list
 [stream_xy, ~] = get_streamline(xx, yy, uu, vv, seed_xy, step_size);
 stream_tri = delaunayTriangulation(stream_xy);
-stream_len = size(stream_xy,1);
+stream_len = size(stream_tri.Points,1);
 
 % create seed point candidate queue 
 seed_queue{1} = get_seed_candidates(stream_xy, d_sep);
+
+if verbose
+    fprintf('%s: start main loop\n', mfilename);
+end
 
 % check all seed candidates
 while ~isempty(seed_queue)
@@ -85,19 +93,22 @@ while ~isempty(seed_queue)
          
         % add seed candidate points to queue
         seed_queue{end+1}  = get_seed_candidates(stream_xy, d_sep); %#ok!
+        
+        if verbose
+            num_lines = length(stream_len);
+            num_seeds = 0;
+            for pp = 1:length(seed_queue)
+                num_seeds = num_seeds+length(seed_queue{pp});
+            end
+            fprintf('%s: %d lines, %d seed candidates\n', ...
+                mfilename, num_lines, num_seeds);
+        end
 
     end
-    
-    if verbose
-        num_lines = length(stream_len);
-        num_seeds = 0;
-        for pp = 1:length(seed_queue)
-            num_seeds = num_seeds+length(seed_queue{pp});
-        end
-        fprintf('%s: %d lines, %d seed candidates\n', ...
-            mfilename, num_lines, num_seeds);
-    end
-    
+end
+
+if verbose
+    fprintf('%s: completed main loop\n', mfilename);
 end
 
 % extract stream line points for output as xy 
@@ -112,6 +123,10 @@ for kk = 1:num_lines
     xy(jj0:jj1,:) = stream_tri.Points(ii0:ii1,:);    
     ii0 = ii1+1;
     jj0 = jj1+2;
+end
+
+if verbose
+    fprintf('%s: completed\n', mfilename);
 end
 
 function [] = sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size)
