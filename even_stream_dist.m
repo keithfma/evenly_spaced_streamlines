@@ -20,4 +20,23 @@ function dist = even_stream_dist(xy)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-error('%s is not implemented', mfilename);
+% get length (# pts) of each streamline
+sep_idx = find(isnan(xy(:,1)));
+start_idx = [1; sep_idx+1];
+stop_idx = [sep_idx-1; size(xy,1)];
+len = stop_idx-start_idx+1;
+num_lines = length(len);
+
+% create triangulation for all points
+is_pt = ~isnan(xy(:,1));
+tri = delaunayTriangulation(xy(is_pt,1), xy(is_pt,2));
+
+% compute dist for points in each line using triangulation
+dist = nan(size(xy, 1), 1);
+for ii = 1:num_lines
+    stream_xy = tri.Points(1:len(ii), :);    
+    tri.Points(1:len(ii), :) = [];    
+    [~, stream_dist] = nearestNeighbor(tri, stream_xy);       
+    dist(start_idx(ii):stop_idx(ii)) = stream_dist;
+    tri.Points = [tri.Points; stream_xy]; 
+end
