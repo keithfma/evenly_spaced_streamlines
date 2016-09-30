@@ -23,15 +23,12 @@ function len = even_stream_len(xy)
 sep_idx = find(isnan(xy(:,1)));
 start_idx = [1; sep_idx+1];
 stop_idx = [sep_idx-1; size(xy,1)];
+num_lines = length(start_idx);
 
-%<DEBUG> 
-%</DEBUG>
-
-% OLD CODE FOR REFERENCE
-% % extract line points and compute distance and arc length
-% num_lines = length(stream_len);
-% stream_data = cell(num_lines, 1);
-% for ii = 1:num_lines
-%     stream_xy = stream_tri.Points(1:stream_len(ii), :);    
-%     stream_l = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
-% end
+% compute arclength for each streamline
+len = nan(size(xy,1), 1);
+for ii = 1:num_lines
+    stream_xy = xy(start_idx(ii):stop_idx(ii), :);
+    stream_len = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
+    len(start_idx(ii):stop_idx(ii)) = stream_len;
+end
