@@ -1,3 +1,4 @@
+
 % Run even_stream() for an example vector field and a range of input
 % parameter options
 
@@ -19,12 +20,12 @@ d_sep = 0.05*range(vv);
 d_test = 0.5*d_sep;
 step_size = 0.1;
 
-[xs, ys, ls, ds] = even_stream2(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
+xy = even_stream_xy(xx, yy, dzdx, dzdy, d_sep, d_test, step_size);
 
 %<DEBUG>
 hold off
 % imagesc([xx(1), xx(end)], [yy(1), yy(end)], zz, 'AlphaData', ~isnan(zz));
 % hold on
-plot(xs, ys, '-k');
+plot(xy(:,1), xy(:,2), '-k');
 %</DEBUG>
 

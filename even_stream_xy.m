@@ -1,7 +1,7 @@
 function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
 % function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
 %
-% Compute evenly-spaced streamlines with Jobar & Lefer algorithm (ref 1)
+% Compute evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %
 % Arguments:
 %   xx, yy, uu, vv: Vector field x-coord, y-coord, vector x-component and
@@ -20,14 +20,7 @@ function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-% input sanity check
-validateattributes(xx, {'numeric'}, {'nonempty'}, mfilename, 'xx');
-validateattributes(yy, {'numeric'}, {'size', size(xx)}, mfilename, 'yy');
-validateattributes(uu, {'numeric'}, {'size', size(xx)}, mfilename, 'uu');
-validateattributes(vv, {'numeric'}, {'size', size(xx)}, mfilename, 'vv');
-validateattributes(d_sep, {'numeric'}, {'scalar', 'positive'}, mfilename, 'd_sep');
-validateattributes(d_test, {'numeric'}, {'scalar', 'positive', '<=', d_sep}, mfilename, 'd_test');
-validateattributes(step_size, {'numeric'}, {'scalar', 'positive'}, mfilename, 'step_size');
+sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size);
 
 % select random non-NaN grid point for initial seed
 while 1
@@ -94,24 +87,39 @@ while ~isempty(seed_queue)
 end
 
 % extract stream line points for output as xy 
+num_pts = size(stream_tri.Points, 1);
 num_lines = length(stream_len);
-stream_data = cell(num_lines, 1);
-for ii = 1:num_lines
-    stream_xy = stream_tri.Points(1:stream_len(ii), :);    
-    stream_tri.Points(1:stream_len(ii), :) = [];    
-    [~, stream_d] = nearestNeighbor(stream_tri, stream_xy);
-    stream_l = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
-    stream_data{ii} = [stream_xy, stream_d, stream_l; nan(1,4)];    
-    stream_tri.Points = [stream_tri.Points; stream_xy]; 
+xy = nan(num_pts+num_lines, 2);
+ii0 = 1; 
+jj0 = 1;
+for kk = 1:num_lines
+    ii1 = ii0+stream_len(kk)-1;
+    jj1 = jj0+stream_len(kk)-1;    
+    xy(jj0:jj1,:) = stream_tri.Points(ii0:ii1,:);    
+    ii0 = ii1+1;
+    jj0 = jj1+2;
 end
 
-% concatenate and split stream data into NaN-separated vectors
-stream_data = cell2mat(stream_data);
-xs = stream_data(:,1);
-ys = stream_data(:,2);
-ds = stream_data(:,3);
-ls = stream_data(:,4);
+function [] = sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size)
+% function [] = sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size)
+% 
+% Check for valid inputs, fail with error if any are invalid
+% %
 
+validateattributes(xx, {'numeric'}, {'nonempty'}, ...
+    mfilename, 'xx');
+validateattributes(yy, {'numeric'}, {'size', size(xx)}, ...
+    mfilename, 'yy');
+validateattributes(uu, {'numeric'}, {'size', size(xx)}, ...
+    mfilename, 'uu');
+validateattributes(vv, {'numeric'}, {'size', size(xx)}, ...
+    mfilename, 'vv');
+validateattributes(d_sep, {'numeric'}, {'scalar', 'positive'}, ...
+    mfilename, 'd_sep');
+validateattributes(d_test, {'numeric'}, {'scalar', 'positive', '<=', d_sep}, ...
+    mfilename, 'd_test');
+validateattributes(step_size, {'numeric'}, {'scalar', 'positive'}, ...
+    mfilename, 'step_size');
 
 function seed_xy = get_seed_candidates(xy, buf_dist)
 %
