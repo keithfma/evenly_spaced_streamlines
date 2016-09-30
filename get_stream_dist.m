@@ -1,13 +1,13 @@
-function dist = even_stream_dist(xy, verbose)
-% function dist = even_stream_dist(xy, verbose)
+function dist = get_stream_dist(xy, verbose)
+% function dist = get_stream_dist(xy, verbose)
 %
 % Return minimum distance to neighboring streamlines for streamlines
-% created with the even_stream_xy fuction. This step is part of the Jobar &
+% created with the get_stream_xy fuction. This step is part of the Jobar &
 % Lefer [1] algorithm to plot evenly spaced streamlines with tapered width.
 %
 % Arguments:
 %   xy = Matrix, evenly-spaced streamlines, as created by the
-%       even_stream_xy function, with [x,y] points in rows, and lines
+%       get_stream_xy function, with [x,y] points in rows, and lines
 %       separated by NaNs
 %   verbose: Scalar, set to True to enable verbose progress messages
 %   dist = Vector, minimum distance to neighboring stream lines for all

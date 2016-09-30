@@ -1,5 +1,5 @@
-function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
-% function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
+function xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
+% function xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %

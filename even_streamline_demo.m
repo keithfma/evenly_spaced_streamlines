@@ -1,7 +1,3 @@
-
-% Run even_stream() for an example vector field and a range of input
-% parameter options
-
 %% Intialize example vector field
 % see documentation for gradient()
 
@@ -21,9 +17,9 @@ d_test = 0.5*d_sep;
 step_size = 0.1;
 verbose = true;
 
-xy = even_stream_xy(xx, yy, dzdx, dzdy, d_sep, d_test, step_size, verbose);
-len = even_stream_len(xy, verbose);
-dist = even_stream_dist(xy, verbose);
+xy = get_stream_xy(xx, yy, dzdx, dzdy, d_sep, d_test, step_size, verbose);
+len = get_stream_len(xy, verbose);
+dist = get_stream_dist(xy, verbose);
 
 %<DEBUG>
 hold off

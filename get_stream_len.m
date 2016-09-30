@@ -1,13 +1,13 @@
-function len = even_stream_len(xy, verbose)
-% function len = even_stream_len(xy, verbose)
+function len = get_stream_len(xy, verbose)
+% function len = get_stream_len(xy, verbose)
 %
-% Return arc length of streamlines created with the even_stream_xy fuction.
+% Return arc length of streamlines created with the get_stream_xy fuction.
 % This step is part of the Jobar & Lefer [1] algorithm to plot evenly
 % spaced streamlines with along-line texture. 
 %
 % Arguments:
 %   xy = Matrix, evenly-spaced streamlines, as created by the
-%       even_stream_xy function, with [x,y] points in rows, and lines
+%       get_stream_xy function, with [x,y] points in rows, and lines
 %       separated by NaNs
 %   verbose: Scalar, set to True to enable verbose progress messages
 %   len = Vector, arc length (distance along the line) for all stream line
