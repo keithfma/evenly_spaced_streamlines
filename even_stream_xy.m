@@ -21,7 +21,7 @@ function xy = even_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-% check inputs
+% handle inputs
 if nargin < 8; verbose = false; end
 sanity_check(xx, yy, uu, vv, d_sep, d_test, step_size);
 
