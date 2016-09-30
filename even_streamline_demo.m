@@ -26,7 +26,7 @@ hold off
 %     'Color', 'r', 'LineWidth', 2, 'Verbose', 1);
 
 hh = even_streamline_taper(xx, yy, dzdx, dzdy, d_sep, d_test, ...
-    'Color', 'r', 'LineWidthMin', 0.5, 'LineWidthMax', 2, 'Verbose', 1);
+    'Color', 'r', 'LineWidthMin', 0.5, 'LineWidthMax', 5, 'Verbose', 1);
 
 %<DEBUG>
 %</DEBUG>

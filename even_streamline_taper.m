@@ -51,10 +51,31 @@ line_width_max = parser.Results.LineWidthMax;
 line_style = parser.Results.LineStyle;
 line_color = parser.Results.Color;
 
-% create plot
+% get streamline data
 xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
 dist = get_stream_dist(xy, verbose);
 
-%<DEBUG>
-keyboard
-%</DEBUG>
+
+% create plot
+num_segments = size(xy,1)-2*sum(isnan(xy(:,1)))-1;
+hh = gobjects(num_segments,1);
+current_segment = 0;
+hold on;
+for ii = 1:length(dist)-1           
+    % skip line endpoints, nothing to plot
+    if any(isnan(xy(ii,:))) || any(isnan(xy(ii+1,:)))
+        continue
+    end
+    % count and report
+    current_segment = current_segment+1;
+    if verbose 
+        fprintf('%s: segment %d of %d\n', mfilename, current_segment, num_segments);
+    end 
+    % compute segment width
+    d_seg = 0.5*(dist(ii)+dist(ii+1));
+    w_coef_seg = max(0.001, min(1, (d_seg-d_test)/(d_sep-d_test)));
+    w_seg = line_width_min+w_coef_seg*(line_width_max-line_width_min);
+    % plot segment
+    hh(current_segment) = plot(xy(ii:ii+1,1), xy(ii:ii+1,2), ...
+        'LineStyle', line_style, 'LineWidth', w_seg, 'Color', line_color);    
+end
