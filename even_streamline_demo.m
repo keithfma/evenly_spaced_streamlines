@@ -22,7 +22,8 @@ step_size = 0.1;
 hold off
 %</DEBUG>
 
-even_streamline(xx, yy, dzdx, dzdy, d_sep, d_test, 'verbose', 1);
+hh = even_streamline(xx, yy, dzdx, dzdy, d_sep, d_test, ...
+    'color', 'r', 'linewidth', 2, 'verbose', 1);
 
 %<DEBUG>
 %</DEBUG>

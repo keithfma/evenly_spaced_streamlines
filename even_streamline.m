@@ -1,5 +1,5 @@
-function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
-% function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
+function hh = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
+% function hh = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %
@@ -15,6 +15,9 @@ function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
 %   'LineStyle': line style as in the built-in plot()
 %   'LineWidth': line width as in the built-in plot()
 %   'Color': line color as in the built-in plot()
+%
+% Returns:
+%   hh = Graphics object for streamlines
 %  
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -44,10 +47,7 @@ line_style = parser.Results.LineStyle;
 line_width = parser.Results.LineWidth;
 line_color = parser.Results.Color;
 
-%<DEBUG>
-disp(step_size);
-disp(verbose);
-disp(line_style);
-disp(line_width);
-disp(line_color);
-%</DEBUG>
+% create plot
+xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
+hh = plot(xy(:,1), xy(:,2), ...
+    'LineStyle', line_style, 'LineWidth', line_width, 'Color', line_color);
