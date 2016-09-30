@@ -21,6 +21,10 @@ function dist = even_stream_dist(xy, verbose)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
+% handle inputs
+if nargin < 2; verbose = false; end
+sanity_check(xy, verbose);
+
 % get length (# pts) of each streamline
 sep_idx = find(isnan(xy(:,1)));
 start_idx = [1; sep_idx+1];
@@ -44,3 +48,22 @@ for ii = 1:num_lines
     dist(start_idx(ii):stop_idx(ii)) = stream_dist;
     tri.Points = [tri.Points; stream_xy]; 
 end
+
+function sanity_check(xy, verbose)
+% function sanity_check(xy, verbose)
+% 
+% Check for valid inputs, fail with error if any are invalid
+% %
+
+validateattributes(xy, {'numeric'}, {'2d', 'ncols', 2}, ...
+    mfilename, 'xy');
+for ii = 1:size(xy,1)
+    if isnan(xy(ii,1))
+        assert(isnan(xy(ii,2)), 'NaN in xy is not used as a separator');
+    end
+end
+assert(~any(isnan(xy(1,:))), 'First row in xy should not contain NaN');
+assert(~any(isnan(xy(end,:))), 'Last row in xy should not contain NaN');
+
+validateattributes(verbose, {'numeric', 'logical'}, {'binary', 'scalar'}, ...
+    mfilename, 'verbose');
