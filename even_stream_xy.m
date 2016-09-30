@@ -107,7 +107,7 @@ end
 % extract stream line points for output as xy 
 num_pts = size(stream_tri.Points, 1);
 num_lines = length(stream_len);
-xy = nan(num_pts+num_lines, 2);
+xy = nan(num_pts+num_lines-1, 2);
 ii0 = 1; 
 jj0 = 1;
 for kk = 1:num_lines

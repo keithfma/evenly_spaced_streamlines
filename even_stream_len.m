@@ -19,4 +19,32 @@ function len = even_stream_len(xy)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-error('%s not yet implemented', mfilename);
+% get indices of first and last points in each streamline
+sep_idx = find(isnan(xy(:,1)));
+start_idx = [1; sep_idx+1];
+stop_idx = [sep_idx-1; size(xy,1)];
+
+%<DEBUG> confirm that index selection works as expected
+
+% plot original lines in blue
+figure 
+plot(xy(:,1), xy(:,2), '-b');
+
+% plot again using start and stop indices explicitly
+hold on
+for ii = 1:length(start_idx)
+    plot(xy(start_idx(ii):stop_idx(ii), 1), xy(start_idx(ii):stop_idx(ii), 2), '-r');
+end
+
+keyboard
+
+%</DEBUG>
+
+% OLD CODE FOR REFERENCE
+% % extract line points and compute distance and arc length
+% num_lines = length(stream_len);
+% stream_data = cell(num_lines, 1);
+% for ii = 1:num_lines
+%     stream_xy = stream_tri.Points(1:stream_len(ii), :);    
+%     stream_l = [0; cumsum(sqrt(sum(diff(stream_xy).^2, 2)))];
+% end
