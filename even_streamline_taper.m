@@ -55,7 +55,6 @@ line_color = parser.Results.Color;
 xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
 dist = get_stream_dist(xy, verbose);
 
-
 % create plot
 num_segments = size(xy,1)-2*sum(isnan(xy(:,1)))-1;
 hh = gobjects(num_segments,1);
