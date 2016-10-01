@@ -139,7 +139,7 @@ while ~isempty(seed_queue)
             for pp = 1:length(seed_queue)
                 num_seeds = num_seeds+length(seed_queue{pp});
             end
-            fprintf('%s: %d lines, %d seed candidates\n', ...
+            fprintf('%s: xy: %d lines, %d seed candidates\n', ...
                 mfilename, num_lines, num_seeds);
         end
 
@@ -173,10 +173,20 @@ end
 
 %% Compute distance to neighbors
 
+dist = nan(size(xy, 1), 1);
 if get_dist
-    % TODO
-else
-    dist = nan(size(xy, 1), 1);
+    kk = 1;
+    for ii = 1:num_lines
+        if verbose
+            fprintf('%s: dist: line %d of %d\n', mfilename, ii, num_lines);
+        end
+        stream_xy = stream_tri.Points(1:stream_len(ii), :);
+        stream_tri.Points(1:stream_len(ii), :) = [];
+        [~, stream_dist] = nearestNeighbor(stream_tri, stream_xy);
+        dist(kk:kk+stream_len(ii)-1) = stream_dist;
+        kk = kk+stream_len(ii)+1;
+        stream_tri.Points = [stream_tri.Points; stream_xy];
+    end
 end
 
 %% Combine data for output
