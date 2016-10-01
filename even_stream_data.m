@@ -40,7 +40,8 @@ function xyld = even_stream_data(xx, yy, uu, vv, varargin)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-% parse and check inputs
+%% parse and check inputs
+
 parser = inputParser;
 parser.CaseSensitive = false;
 parser.PartialMatching = false;
@@ -64,7 +65,7 @@ verbose = parser.Results.Verbose;
 sanity_check(xx, yy, uu, vv, dist_sep, dist_test, step_size, get_len, ...
     get_dist, verbose);
 
-keyboard
+%% Compute stream line points
 
 % disable nuisance warning(s)
 % ...Delaunay triangulation drops duplicate points from streamlines, OK
@@ -85,7 +86,7 @@ stream_tri = delaunayTriangulation(stream_xy);
 stream_len = size(stream_tri.Points,1);
 
 % create seed point candidate queue 
-seed_queue{1} = get_seed_candidates(stream_xy, d_sep);
+seed_queue{1} = get_seed_candidates(stream_xy, dist_sep);
 
 % check all seed candidates
 while ~isempty(seed_queue)
@@ -99,7 +100,7 @@ while ~isempty(seed_queue)
         
         % skip if candidate istoo close to any streamline point
         [~, d_min] = nearestNeighbor(stream_tri, seed_xy(ii,:));
-        if d_min < d_sep
+        if d_min < dist_sep
             continue
         end
                 
@@ -112,13 +113,13 @@ while ~isempty(seed_queue)
         % trim new streamline        
         for jj = seed_idx:size(stream_xy,1)
             [~, d_min] = nearestNeighbor(stream_tri, stream_xy(jj,:));
-            if d_min < d_test
+            if d_min < dist_test
                 break
             end
         end
         for kk = seed_idx:-1:1
             [~, d_min] = nearestNeighbor(stream_tri, stream_xy(kk,:));
-            if d_min < d_test
+            if d_min < dist_test
                 break
             end
         end
@@ -130,7 +131,7 @@ while ~isempty(seed_queue)
         stream_len(end+1) = size(stream_tri.Points, 1)-len0; %#ok!
          
         % add seed candidate points to queue
-        seed_queue{end+1}  = get_seed_candidates(stream_xy, d_sep); %#ok!
+        seed_queue{end+1}  = get_seed_candidates(stream_xy, dist_sep); %#ok!
         
         if verbose
             num_lines = length(stream_len);
@@ -161,6 +162,29 @@ end
 
 % enable nuisance warning(s)
 warning('on', 'MATLAB:delaunayTriangulation:DupPtsWarnId'); 
+
+%% Compute arc length
+
+if get_len
+    % TODO
+else
+    len = nan(size(xy, 1), 1);
+end
+
+%% Compute distance to neighbors
+
+if get_dist
+    % TODO
+else
+    dist = nan(size(xy, 1), 1);
+end
+
+%% Combine data for output
+
+keyboard
+
+xyld = [xy, len, dist];
+
 
 function [] = sanity_check(xx, yy, uu, vv, dist_sep, dist_test, ...
     step_size, get_len, get_dist, verbose)

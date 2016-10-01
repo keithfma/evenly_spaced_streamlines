@@ -6,14 +6,6 @@ hh = vv(2)-vv(1);
 zz = xx .* exp(-xx.^2 - yy.^2);
 [dzdx, dzdy] = gradient(zz, hh, hh);
 
-
-% %<DEBUG> Compute streamline data
-% verbose = true;
-% xy = get_stream_xy(xx, yy, dzdx, dzdy, d_sep, d_test, step_size, verbose);
-% len = get_stream_len(xy, verbose);
-% dist = get_stream_dist(xy, verbose);
-% %</DEBUG>
-
 %% Compute streamline data
 
 d_sep = 0.05*range(vv);
@@ -22,7 +14,7 @@ step_size = 0.1;
 
 xyld = even_stream_data(xx, yy, dzdx, dzdy, ...
     'DistSep', d_sep, 'DistTest', d_test, 'StepSize', step_size, ...
-    'GetLength', true, 'GetDist', true, 'Verbose', true);
+    'GetLength', false, 'GetDist', false, 'Verbose', true);
 
 %% Plot lines in all styles
 
