@@ -22,15 +22,27 @@ hf = figure;
 hf.Name = mfilename;
 
 % normal lines
-subplot(2,2,1);
+ax = subplot(2,2,1);
 even_stream_line(xyld, 'LineWidth', 1, 'Color', 'k', 'LineStyle', '-');
 title('even\_stream\_line');
-ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 
 % taper
+ax = subplot(2,2,2);
+title('even\_stream\_taper');
+even_stream_taper(xyld);
+ax.XTick = [];
+ax.YTick = [];
 
 % arrow
+ax = subplot(2,2,3);
+title('even\_stream\_arrow');
+ax.XTick = [];
+ax.YTick = [];
 
 % texture
+ax = subplot(2,2,4);
+title('even\_stream\_texture');
+ax.XTick = [];
+ax.YTick = [];

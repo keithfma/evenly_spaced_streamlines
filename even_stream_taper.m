@@ -1,22 +1,19 @@
-function hh = even_streamline_taper(xx, yy, uu, vv, d_sep, d_test, varargin)
-% function hh = even_streamline_taper(xx, yy, uu, vv, d_sep, d_test, varargin)
+function hh = even_stream_taper(xyld, varargin)
+% function hh = even_stream_taper(xyld, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1] using the
 % line tapering effect.
 %
 % Arguments:
-%   xx, yy, uu, vv: Vector field x-coord, y-coord, vector x-component and
-%       vector y-component, respectively, sizes must match
-%   d_sep: Scalar, minimum distance between seed points and stream lines
-%   d_test: Scalar, minimum distance between stream lines
+%   xyld: Matrix with columns [x, y, len, dist], as produced by
+%       even_stream_data. Only the x, y, and len columns are needed.
 %
 % Optional Parameters (Name - Value):
-%   'StepSize': stream line step size as in the built-in stream2
-%   'Verbose': set true to enable verbose messages, default = false
 %   'LineWidthMin': minimum line width as in the built-in plot(), default = 0.5
 %   'LineWidthMax': maximum line width as in the built-in plot(), default = 2
 %   'LineStyle': line style as in the built-in plot(), default = '-'
 %   'Color': line color as in the built-in plot(), default = 'b'
+%   'Verbose': set true to enable verbose messages, default = false
 %
 % Returns:
 %   hh = Graphics object for streamlines
@@ -30,47 +27,43 @@ function hh = even_streamline_taper(xx, yy, uu, vv, d_sep, d_test, varargin)
 % %
 
 % handle inputs
-% NOTE: sanity checks are defered to child functions
 parser = inputParser;
 parser.CaseSensitive = false;
 parser.PartialMatching = false;
 parser.KeepUnmatched = false;
 
-parser.addParameter('stepsize', 0.1);
-parser.addParameter('verbose', false);
 parser.addParameter('LineWidthMin', 0.5);
 parser.addParameter('LineWidthMax', 2);
 parser.addParameter('LineStyle', '-');
 parser.addParameter('Color', 'b');
+parser.addParameter('Verbose', false);
 
 parser.parse(varargin{:});
-step_size = parser.Results.stepsize;
-verbose = parser.Results.verbose;
 line_width_min = parser.Results.LineWidthMin;
 line_width_max = parser.Results.LineWidthMax;
 line_style = parser.Results.LineStyle;
 line_color = parser.Results.Color;
-
-% get streamline data
-xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
-dist = get_stream_dist(xy, verbose);
+verbose = parser.Results.Verbose;
 
 % reformat streamlines as segments 
-num_segments = size(xy,1)-2*sum(isnan(xy(:,1)))-1;
+num_segments = size(xyld,1)-2*sum(isnan(xyld(:,1)))-1;
 x_segment = nan(num_segments, 2);
 y_segment = nan(num_segments, 2);
 d_segment = nan(num_segments, 1);
 current_segment = 0;
-for ii = 1:length(dist)-1           
+for ii = 1:size(xyld,1)-1           
     % skip line endpoints, nothing to plot
-    if any(isnan(xy(ii,:))) || any(isnan(xy(ii+1,:)))
+    if any(isnan(xyld(ii,1:2))) || any(isnan(xyld(ii+1,1:2)))
         continue
     end
     current_segment = current_segment+1;
-    x_segment(current_segment, :) = xy(ii:ii+1,1);
-    y_segment(current_segment, :) = xy(ii:ii+1,2);
-    d_segment(current_segment) = 0.5*(dist(ii)+dist(ii+1));
+    x_segment(current_segment, :) = xyld(ii:ii+1,1);
+    y_segment(current_segment, :) = xyld(ii:ii+1,2);
+    d_segment(current_segment) = mean(xyld(ii:ii+1,4));
 end
+
+keyboard
+% START HERE
 
 % get segment width rounded to 0.1 pt
 w_coef = max(0.001, min(1, (d_segment-d_test)/(d_sep-d_test)));
