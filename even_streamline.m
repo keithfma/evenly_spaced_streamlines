@@ -1,5 +1,5 @@
-function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
-% function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
+function hh = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
+% function hh = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %
@@ -8,8 +8,16 @@ function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
 %       vector y-component, respectively, sizes must match
 %   d_sep: Scalar, minimum distance between seed points and stream lines
 %   d_test: Scalar, minimum distance between stream lines
-%   step_size: Scalar, stream line step size as in the built-in stream2
-%   verbose: Scalar, set to True to enable verbose progress messages
+%
+% Optional Parameters (Name - Value):
+%   'StepSize': stream line step size as in the built-in stream2, default = 0.1
+%   'Verbose': set true to enable verbose messages, default = false
+%   'LineStyle': line style as in the built-in plot(), default = '-'
+%   'LineWidth': line width as in the built-in plot(), default = 0.5
+%   'Color': line color as in the built-in plot(), default = 'b'
+%
+% Returns:
+%   hh = Graphics object for streamlines
 %  
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -19,4 +27,27 @@ function [] = even_streamline(xx, yy, uu, vv, d_sep, d_test, step_size, verbose)
 %   Vienna: Springer Vienna. http://doi.org/10.1007/978-3-7091-6876-9_5
 % %
 
-error('%s not implemented', mfilename);
+% handle inputs
+% NOTE: sanity checks are defered to child functions
+parser = inputParser;
+parser.CaseSensitive = false;
+parser.PartialMatching = false;
+parser.KeepUnmatched = false;
+
+parser.addParameter('stepsize', 0.1);
+parser.addParameter('verbose', false);
+parser.addParameter('LineStyle', '-');
+parser.addParameter('LineWidth', 0.5);
+parser.addParameter('Color', 'b');
+
+parser.parse(varargin{:});
+step_size = parser.Results.stepsize;
+verbose = parser.Results.verbose;
+line_style = parser.Results.LineStyle;
+line_width = parser.Results.LineWidth;
+line_color = parser.Results.Color;
+
+% create plot
+xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
+hh = plot(xy(:,1), xy(:,2), ...
+    'LineStyle', line_style, 'LineWidth', line_width, 'Color', line_color);
