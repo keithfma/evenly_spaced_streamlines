@@ -1,5 +1,5 @@
-function xyld = even_stream_data(xx, yy, uu, vv, varargin) 
-% function xyld = even_stream_data(xx, yy, uu, vv, varargin) 
+function xyld = even_stream_data(xx, yy, uu, vv, varargin)
+% function xyld = even_stream_data(xx, yy, uu, vv, varargin)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm [1].
 % Always returns streamline points. Optionally, return arc length
@@ -11,28 +11,28 @@ function xyld = even_stream_data(xx, yy, uu, vv, varargin)
 %   uu, vv: Vector field x-component and y-component
 %
 % Optional Parameters (Name - Value):
-%   'DistSep': Scalar, minimum distance between seed point and streamlines, 
-%       default = 5% minimum domain width 
-%   'DistTest': Scalar, minimum distance between streamlines, 
-%       default = 2% minimum domain width 
+%   'DistSep': Scalar, minimum distance between seed point and streamlines,
+%       default = 5% minimum domain width
+%   'DistTest': Scalar, minimum distance between streamlines,
+%       default = 2% minimum domain width
 %   'StepSize': Scalar, streamline step size, see streamline() for details,
 %       default = 0.1
 %   'GetLength': Set true to compute and return 'len',
 %       default = false
 %   'GetDist': Set true to compute and return 'dist',
 %       default = false
-%   'Verbose': set true to enable verbose messages, 
+%   'Verbose': set true to enable verbose messages,
 %       default = false
 %
-% Return: 
-%   xyld: Matrix, [x, y, len, dist] for stream line points, each row is a point, 
+% Return:
+%   xyld: Matrix, [x, y, len, dist] for stream line points, each row is a point,
 %       individual lines are separated by NaNs, x is the x-coord, y is the
 %       y-coord, len is the arc length (distance along the line), dist is
 %       the minimum distance to neighboring stream lines. 'len' and 'dist'
 %       are computed only if 'GetLen' and 'GetDist' are set to true,
 %       respectively, otherwise, these columns are set to NaN.
-%  
-% References: 
+%
+% References:
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
 %   Arbitrary Density. In W. Lefer & M. Grave (Eds.), Visualization in
 %   Scientific Computing ?97: Proceedings of the Eurographics Workshop in
@@ -69,14 +69,14 @@ sanity_check(xx, yy, uu, vv, dist_sep, dist_test, step_size, get_len, ...
 
 % disable nuisance warning(s)
 % ...Delaunay triangulation drops duplicate points from streamlines, OK
-warning('off', 'MATLAB:delaunayTriangulation:DupPtsWarnId'); 
+warning('off', 'MATLAB:delaunayTriangulation:DupPtsWarnId');
 
 % select random non-NaN grid point for initial seed
 while 1
-  kk = randi([1, numel(xx)]);
-  if ~isnan(uu(kk)) && ~isnan(vv(kk))
-      break
-  end
+    kk = randi([1, numel(xx)]);
+    if ~isnan(uu(kk)) && ~isnan(vv(kk))
+        break
+    end
 end
 seed_xy = [xx(kk), yy(kk)];
 
@@ -85,15 +85,15 @@ seed_xy = [xx(kk), yy(kk)];
 stream_tri = delaunayTriangulation(stream_xy);
 stream_len = size(stream_tri.Points,1);
 
-% create seed point candidate queue 
+% create seed point candidate queue
 seed_queue{1} = get_seed_candidates(stream_xy, dist_sep);
 
 % check all seed candidates
 while ~isempty(seed_queue)
     
     % pop seed candidates from queue
-    seed_xy = seed_queue{1}; 
-    seed_queue(1) = []; 
+    seed_xy = seed_queue{1};
+    seed_queue(1) = [];
     
     % check each seed candidate in random order
     for ii = randperm(length(seed_xy))
@@ -103,14 +103,14 @@ while ~isempty(seed_queue)
         if d_min < dist_sep
             continue
         end
-                
+        
         % create new streamline, skip if empty
         [stream_xy, seed_idx] = get_streamline(xx, yy, uu, vv, seed_xy(ii,:), step_size);
         if size(stream_xy,1) < 2
             continue
-        end 
-         
-        % trim new streamline        
+        end
+        
+        % trim new streamline
         for jj = seed_idx:size(stream_xy,1)
             [~, d_min] = nearestNeighbor(stream_tri, stream_xy(jj,:));
             if d_min < dist_test
@@ -129,7 +129,7 @@ while ~isempty(seed_queue)
         len0 = size(stream_tri.Points, 1);
         stream_tri.Points = [stream_tri.Points; stream_xy];
         stream_len(end+1) = size(stream_tri.Points, 1)-len0; %#ok!
-         
+        
         % add seed candidate points to queue
         seed_queue{end+1}  = get_seed_candidates(stream_xy, dist_sep); %#ok!
         
@@ -142,33 +142,41 @@ while ~isempty(seed_queue)
             fprintf('%s: xy: %d lines, %d seed candidates\n', ...
                 mfilename, num_lines, num_seeds);
         end
-
+        
     end
 end
 
-% extract stream line points for output as xy 
+% extract stream line points for output as xy
 num_pts = size(stream_tri.Points, 1);
 num_lines = length(stream_len);
 xy = nan(num_pts+num_lines-1, 2);
-ii0 = 1; 
+ii0 = 1;
 jj0 = 1;
 for kk = 1:num_lines
     ii1 = ii0+stream_len(kk)-1;
-    jj1 = jj0+stream_len(kk)-1;    
-    xy(jj0:jj1,:) = stream_tri.Points(ii0:ii1,:);    
+    jj1 = jj0+stream_len(kk)-1;
+    xy(jj0:jj1,:) = stream_tri.Points(ii0:ii1,:);
     ii0 = ii1+1;
     jj0 = jj1+2;
 end
 
 % enable nuisance warning(s)
-warning('on', 'MATLAB:delaunayTriangulation:DupPtsWarnId'); 
+warning('on', 'MATLAB:delaunayTriangulation:DupPtsWarnId');
 
 %% Compute arc length
 
+len = nan(size(xy, 1), 1);
 if get_len
-    % TODO
-else
-    len = nan(size(xy, 1), 1);
+    kk = 1;
+    for ii = 1:num_lines
+        if verbose
+            fprintf('%s: len: line %d of %d\n', mfilename, ii, num_lines);
+        end
+        this_xy = xy(kk:kk+stream_len(ii)-1, :);
+        this_len = [0; cumsum(sqrt(sum(diff(this_xy).^2, 2)))];
+        len(kk:kk+stream_len(ii)-1) = this_len;
+        kk = kk+stream_len(ii)+1;
+    end
 end
 
 %% Compute distance to neighbors
@@ -191,16 +199,13 @@ end
 
 %% Combine data for output
 
-keyboard
-
 xyld = [xy, len, dist];
-
 
 function [] = sanity_check(xx, yy, uu, vv, dist_sep, dist_test, ...
     step_size, get_len, get_dist, verbose)
 % function [] = sanity_check(xx, yy, uu, vv, dist_sep, dist_test, ...
 %     step_size, get_len, get_dist, verbose)
-% 
+%
 % Check for valid inputs, fail with error if any are invalid
 % %
 
@@ -228,7 +233,7 @@ validateattributes(verbose, {'numeric', 'logical'}, {'scalar', 'binary'}, ...
 function seed_xy = get_seed_candidates(xy, buf_dist)
 %
 % Compute the location of stream line seed point candidates that lie at a
-% distance 'buf_dist' along a normal vector at each point in 'xy' 
+% distance 'buf_dist' along a normal vector at each point in 'xy'
 %
 % Arguments:
 %   xy: Matrix, [x,y] coordinates of points along a streamline in rows
@@ -250,7 +255,7 @@ function [stream_xy, seed_idx] = get_streamline(xx, yy, uu, vv, seed_xy, step_si
 %
 % Compute streamline in both directions starting at seed point
 %
-% Arguments: 
+% Arguments:
 %   xx, yy:
 %   uu, vv:
 %   seed_xy: Vector, [x, y] coordinates of seed point

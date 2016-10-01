@@ -14,7 +14,7 @@ step_size = 0.1;
 
 xyld = even_stream_data(xx, yy, dzdx, dzdy, ...
     'DistSep', d_sep, 'DistTest', d_test, 'StepSize', step_size, ...
-    'GetLength', false, 'GetDist', true, 'Verbose', true);
+    'GetLength', true, 'GetDist', true, 'Verbose', true);
 
 %% Plot lines in all styles
 
