@@ -53,13 +53,15 @@ validateattributes(period, {'numeric'}, {'scalar', 'positive', 'integer'}, ...
 xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
 len = get_stream_len(xy, verbose);
 
-% get colors and color index for each segment
+% get colormap
 num_colors = 256;
+colors = flipud(gray(num_colors));
+
+% get color index for each segment
 idx = (1:length(len))';
 color_coeff = 0.5*(1+sin(2*pi*idx/period)) + mod(idx, period)/(period-1);
 color_coeff = (color_coeff-min(color_coeff))/range(color_coeff);
 color_idx = min(num_colors, max(1, round(num_colors*color_coeff)));
-colors = flipdud(gray(num_colors));
 
 % create plot
 num_segments = size(xy,1)-2*sum(isnan(xy(:,1)))-1;
