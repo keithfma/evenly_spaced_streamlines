@@ -53,32 +53,48 @@ validateattributes(period, {'numeric'}, {'scalar', 'positive', 'integer'}, ...
 xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
 len = get_stream_len(xy, verbose);
 
-% get colormap
-num_colors = 256;
-colors = flipud(gray(num_colors));
-
-% get color index for each segment
-idx = (1:length(len))';
-color_coeff = 0.5*(1+sin(2*pi*idx/period)) + mod(idx, period)/(period-1);
-color_coeff = (color_coeff-min(color_coeff))/range(color_coeff);
-color_idx = min(num_colors, max(1, round(num_colors*color_coeff)));
-
-% create plot
+% reformat streamlines as segments 
 num_segments = size(xy,1)-2*sum(isnan(xy(:,1)))-1;
-hh = gobjects(num_segments,1);
+x_segment = nan(num_segments, 2);
+y_segment = nan(num_segments, 2);
 current_segment = 0;
-hold on;
 for ii = 1:length(len)-1           
     % skip line endpoints, nothing to plot
     if any(isnan(xy(ii,:))) || any(isnan(xy(ii+1,:)))
         continue
     end
-    % count and report
     current_segment = current_segment+1;
-    if verbose 
-        fprintf('%s: segment %d of %d\n', mfilename, current_segment, num_segments);
-    end 
-    % plot segment
-    hh(current_segment) = plot(xy(ii:ii+1,1), xy(ii:ii+1,2), ...
-        'LineWidth', line_width, 'Color', colors(color_idx(ii), :));
+    x_segment(current_segment, :) = xy(ii:ii+1,1);
+    y_segment(current_segment, :) = xy(ii:ii+1,2);
+end
+
+% get colormap
+num_colors = 256;
+colors = flipud(gray(num_colors));
+
+% get colormap index for each segment
+idx = (1:num_segments)';
+color_coeff = 0.5*(1+sin(2*pi*idx/period)) + mod(idx, period)/(period-1);
+color_coeff = (color_coeff-min(color_coeff))/range(color_coeff);
+c_segment = min(num_colors, max(1, round(num_colors*color_coeff)));
+
+% create plot: for efficieny, plot all segments with the same color at once
+unique_colors = unique(c_segment);
+num_unique_colors = length(unique_colors); 
+hh = gobjects(num_unique_colors,1);
+for ii = 1:num_unique_colors
+    % get segments of this color
+    cc = unique_colors(ii);
+    is_cc = find(c_segment==cc);
+    num_segment_cc = length(is_cc);
+    x_segment_cc = nan(3*num_segment_cc, 1);
+    x_segment_cc(1:3:end) = x_segment(is_cc, 1);
+    x_segment_cc(2:3:end) = x_segment(is_cc, 2);    
+    y_segment_cc = nan(3*num_segment_cc, 1);
+    y_segment_cc(1:3:end) = y_segment(is_cc, 1);
+    y_segment_cc(2:3:end) = y_segment(is_cc, 2);    
+    % plot all segments at once
+    hh(ii) = plot(x_segment_cc, y_segment_cc, ...
+        'LineWidth', line_width, 'Color', colors(cc, :));
+    hold on
 end
