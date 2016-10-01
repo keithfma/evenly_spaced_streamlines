@@ -1,17 +1,13 @@
-function hh = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
-% function hh = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
+function hh = even_stream_line(xyld, varargin)
+% function hh = even_stream_line(xyld, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %
 % Arguments:
-%   xx, yy, uu, vv: Vector field x-coord, y-coord, vector x-component and
-%       vector y-component, respectively, sizes must match
-%   d_sep: Scalar, minimum distance between seed points and stream lines
-%   d_test: Scalar, minimum distance between stream lines
+%   xyld: Matrix with columns [x, y, len, dist], as produced by
+%       even_stream_data. Only the x and y columns are needed.
 %
 % Optional Parameters (Name - Value):
-%   'StepSize': stream line step size as in the built-in stream2, default = 0.1
-%   'Verbose': set true to enable verbose messages, default = false
 %   'LineStyle': line style as in the built-in plot(), default = '-'
 %   'LineWidth': line width as in the built-in plot(), default = 0.5
 %   'Color': line color as in the built-in plot(), default = 'b'
@@ -28,26 +24,21 @@ function hh = even_streamline(xx, yy, uu, vv, d_sep, d_test, varargin)
 % %
 
 % handle inputs
-% NOTE: sanity checks are defered to child functions
 parser = inputParser;
 parser.CaseSensitive = false;
 parser.PartialMatching = false;
 parser.KeepUnmatched = false;
 
-parser.addParameter('stepsize', 0.1);
-parser.addParameter('verbose', false);
 parser.addParameter('LineStyle', '-');
 parser.addParameter('LineWidth', 0.5);
 parser.addParameter('Color', 'b');
+parser.addParameter('Verbose', false);
 
 parser.parse(varargin{:});
-step_size = parser.Results.stepsize;
-verbose = parser.Results.verbose;
 line_style = parser.Results.LineStyle;
 line_width = parser.Results.LineWidth;
 line_color = parser.Results.Color;
 
 % create plot
-xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
-hh = plot(xy(:,1), xy(:,2), ...
+hh = plot(xyld(:,1), xyld(:,2), ...
     'LineStyle', line_style, 'LineWidth', line_width, 'Color', line_color);

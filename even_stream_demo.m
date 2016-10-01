@@ -8,27 +8,29 @@ zz = xx .* exp(-xx.^2 - yy.^2);
 
 %% Compute streamline data
 
-d_sep = 0.05*range(vv);
-d_test = 0.5*d_sep;
+dist_sep = 0.05*range(vv);
+dist_test = 0.5*dist_sep;
 step_size = 0.1;
 
 xyld = even_stream_data(xx, yy, dzdx, dzdy, ...
-    'DistSep', d_sep, 'DistTest', d_test, 'StepSize', step_size, ...
+    'DistSep', dist_sep, 'DistTest', dist_test, 'StepSize', step_size, ...
     'GetLength', true, 'GetDist', true, 'Verbose', true);
 
 %% Plot lines in all styles
 
-% hold off
-% 
-% % hh = even_stream_demo(xx, yy, dzdx, dzdy, d_sep, d_test, ...
-% %     'Color', 'r', 'LineWidth', 2, 'Verbose', 1);
-% 
-% hh = even_stream_taper(xx, yy, dzdx, dzdy, d_sep, d_test, ...
-%     'Color', 'r', 'LineWidthMin', 0.5, 'LineWidthMax', 5, 'Verbose', 1);
-% 
-% % [hl, ha] = even_stream_arrow(xx, yy, dzdx, dzdy, d_sep, d_test, ...
-% %     'Color', 'r', 'LineWidth', 1, 'Verbose', 1);
-% 
-% % hh = even_stream_texture(xx, yy, dzdx, dzdy, d_sep, d_test, ...
-% %     'Verbose', 1, 'LineWidth', 3);
+hf = figure;
+hf.Name = mfilename;
 
+% normal lines
+subplot(2,2,1);
+even_stream_line(xyld, 'LineWidth', 1, 'Color', 'k', 'LineStyle', '-');
+title('even\_stream\_line');
+ax = gca;
+ax.XTick = [];
+ax.YTick = [];
+
+% taper
+
+% arrow
+
+% texture
