@@ -2,6 +2,8 @@
 
 Plot evenly-spaced streamlines for a vector field in MATLAB with Jobard and Lefer 1997 algorithm
 
+See https://keithfma.github.io/evenly_spaced_streamlines/ for examples.
+
 ## References
 
 Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of Arbitrary
