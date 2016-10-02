@@ -1,5 +1,5 @@
-function [hl, ha] = even_stream_arrow(xyld, varargin)
-% function [hl, ha] = even_stream_arrow(xyld, varargin)
+function [hl, ha] = even_stream_arrow(xyd, varargin)
+% function [hl, ha] = even_stream_arrow(xyd, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1] with
 % arrow glyphs to indicate the flow direction. Uses the 'arrow' package by
@@ -7,12 +7,12 @@ function [hl, ha] = even_stream_arrow(xyld, varargin)
 % below.
 %
 % Arguments:
-%   xyld: Matrix with columns [x, y, len, dist], as produced by
+%   xyd: Matrix with columns [x, y, dist], as produced by
 %       even_stream_data. Only the x and y columns are needed.
 %
 % Optional Parameters (Name - Value):
-%   'LineStyle': line style, as in the plot(), default = '-'
-%   'LineWidth': line width, as in the plot(), default = 0.5
+%   'LineStyle': line style, as in plot(), default = '-'
+%   'LineWidth': line width, as in plot(), default = 0.5
 %   'Color': line and arrow color, as in plot(), default = 'b'
 %   'ArrowLength': arrow head length in pixels, default = 20
 %   'ArrowTipAngle': arrow head tip angle in degrees, default = 20
@@ -55,12 +55,12 @@ arrow_base_angle = parser.Results.ArrowBaseAngle;
 arrow_space = parser.Results.ArrowSpace;
 
 % plot lines
-hl = plot(xyld(:,1), xyld(:,2), ...
+hl = plot(xyd(:,1), xyd(:,2), ...
     'LineStyle', line_style, 'LineWidth', line_width, 'Color', color);
 
 % plot arrows
-xy_from = xyld(arrow_space:arrow_space:end, 1:2);
-xy_to = xyld(1+arrow_space:arrow_space:end, 1:2);
+xy_from = xyd(arrow_space:arrow_space:end, 1:2);
+xy_to = xyd(1+arrow_space:arrow_space:end, 1:2);
 xy_nan = any(isnan(xy_from), 2) | any(isnan(xy_to), 2);
 xy_from = xy_from(~xy_nan, :);
 xy_to = xy_to(~xy_nan, :);

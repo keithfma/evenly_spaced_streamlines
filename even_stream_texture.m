@@ -1,13 +1,13 @@
-function hh = even_stream_texture(xyld, varargin)
-% function hh = even_stream_texture(xyld, varargin)
+function hh = even_stream_texture(xyd, varargin)
+% function hh = even_stream_texture(xyd, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1] using the
 % texturing effect to produce results similar to the line integral
 % convolution (LIC) technique.
 %
 % Arguments:
-%   xyld: Matrix with columns [x, y, len, dist], as produced by
-%       even_stream_data. Only the x , y, and len columns are needed.
+%   xyd: Matrix with columns [x, y, dist], as produced by
+%       even_stream_data. Only the x and y columns are needed.
 %
 % Optional Parameters (Name - Value):
 %   'LineWidth': line width, as in the plot(), default = 0.5
@@ -41,18 +41,18 @@ validateattributes(period, {'numeric'}, {'scalar', 'positive', 'integer'}, ...
     mfilename, 'period');
 
 % reformat streamlines as segments 
-num_segments = size(xyld, 1)-2*sum(isnan(xyld(:,1)))-1;
+num_segments = size(xyd, 1)-2*sum(isnan(xyd(:,1)))-1;
 x_segment = nan(num_segments, 2);
 y_segment = nan(num_segments, 2);
 current_segment = 0;
-for ii = 1:size(xyld,1)-1           
+for ii = 1:size(xyd,1)-1           
     % skip line endpoints, nothing to plot
-    if any(isnan(xyld(ii,1:2))) || any(isnan(xyld(ii+1,1:2)))
+    if any(isnan(xyd(ii,1:2))) || any(isnan(xyd(ii+1,1:2)))
         continue
     end
     current_segment = current_segment+1;
-    x_segment(current_segment, :) = xyld(ii:ii+1,1);
-    y_segment(current_segment, :) = xyld(ii:ii+1,2);
+    x_segment(current_segment, :) = xyd(ii:ii+1,1);
+    y_segment(current_segment, :) = xyd(ii:ii+1,2);
 end
 
 % get colormap
@@ -64,8 +64,6 @@ idx = (1:num_segments)';
 color_coeff = 0.5*(1+sin(2*pi*idx/period)) + mod(idx, period)/(period-1);
 color_coeff = (color_coeff-min(color_coeff))/range(color_coeff);
 c_segment = min(num_colors, max(1, round(num_colors*color_coeff)));
-
-keyboard
 
 % create plot: for efficieny, plot all segments with the same color at once
 unique_colors = unique(c_segment);
