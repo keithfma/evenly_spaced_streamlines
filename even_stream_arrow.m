@@ -59,6 +59,7 @@ hl = plot(xy(:,1), xy(:,2), ...
     'LineStyle', line_style, 'LineWidth', line_width, 'Color', color);
 
 % plot arrows
+% TODO: debug occasional error at line 66
 xy_from = xy(arrow_space:arrow_space:end, 1:2);
 xy_to = xy(1+arrow_space:arrow_space:end, 1:2);
 xy_nan = any(isnan(xy_from), 2) | any(isnan(xy_to), 2);

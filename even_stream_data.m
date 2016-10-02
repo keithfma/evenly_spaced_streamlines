@@ -1,35 +1,36 @@
-function [xy, dist] = even_stream_data(xx, yy, uu, vv, varargin)
-% function [xy, dist] = even_stream_data(xx, yy, uu, vv, varargin)
+function [xy, dist] = even_stream_data(xx, yy, uu, vv, dist_sep, dist_test, varargin)
+% [xy, dist] = even_stream_data(xx, yy, uu, vv, dist_sep, dist_test)
+% [xy, dist] = even_stream_data(___, Name, Value)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm [1].
 % Always returns streamline points. Optionally, return arc length
 % (distance along each streamline) and minimum distance to neighboring
 % lines.
 %
-% Arguments:
+% Required Arguments:
 %   xx, yy: Matrices or vectors, x-coord and y-coord. If matrices, the
 %       size must match uu and vv. If vectors, xx must match the number of
 %       columns in uu and vv, and yy must match the number of rows.
 %   uu, vv: Matrices, vector field x-component and y-component
+%   dist_sep: Scalar, minimum distance between seed point and streamlines,
+%       as a fraction of the minimum domain width (i.e. min( range(xx(:)),
+%       range(yy(:)) ) , if set to [], use default = 0.05
+%   dist_test: Scalar, minimum distance between streamlines, as a fraction
+%       of the minimum domain width, id set to [], use default = 0.02
 %
 % Optional Parameters (Name - Value):
-%   'DistSep': Scalar, minimum distance between seed point and streamlines,
-%       default = 5% minimum domain width
-%   'DistTest': Scalar, minimum distance between streamlines,
-%       default = 2% minimum domain width
 %   'StepSize': Scalar, streamline step size, see streamline() for details,
 %       default = 0.1
+%   'MaxNumVertex', Scalar, maximum number of points in each stream line,
+%       see streamline() for details, default = 10,000
 %   'Verbose': set true to enable verbose messages,
 %       default = false
 %
 % Return:
-%   xyd: Matrix, [x, y, dist] for stream line points, each row is a point,
-%       individual lines are separated by NaNs, x is the x-coord, y is the
-%       y-coord, and dist is the minimum distance to neighboring stream
-%       lines. 'dist' is computed only if 'GetDist' is set to true,
-%       respectively, otherwise, the column is set to NaN.
-%   dist: Vector, minimum distance to neighboring stream
-%       lines, only computed only if nargout>1.
+%   xy: Matrix, [x, y] coordinates for stream line points, each row is a
+%       point, individual lines are separated by NaNs.
+%   dist: Vector, minimum distance to neighboring stream lines, only
+%       computed only if nargout>1.
 %
 % References:
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -41,27 +42,48 @@ function [xy, dist] = even_stream_data(xx, yy, uu, vv, varargin)
 
 %% parse and check inputs
 
+% handle optional arguments
+if isempty(dist_sep); dist_sep = 0.05; end
+if isempty(dist_test); dist_test = 0.02; end
+
+% handle optional name-value parameters
 parser = inputParser;
 parser.CaseSensitive = false;
 parser.PartialMatching = false;
 parser.KeepUnmatched = false;
-
-parser.addParameter('DistSep', 0.05*min(range(xx(:)), range(yy(:))));
-parser.addParameter('DistTest', 0.02*min(range(xx(:)), range(yy(:))) );
 parser.addParameter('StepSize', 0.1);
+parser.addParameter('MaxNumVertex', 10000);
 parser.addParameter('Verbose', false);
-
 parser.parse(varargin{:});
-dist_sep = parser.Results.DistSep;
-dist_test = parser.Results.DistTest;
 step_size = parser.Results.StepSize;
+max_num_vertex = parser.Results.MaxNumVertex;
 verbose = parser.Results.Verbose;
 
-if (isvector(xx) && isvector(yy)) && ~isvector(uu)
+% convert coordinate vectors to grids, if indicated
+if isvector(xx) && isvector(yy)
     [xx, yy] = meshgrid(xx, yy);
 end
 
-sanity_check(xx, yy, uu, vv, dist_sep, dist_test, step_size, verbose);
+% check for sane values
+validateattributes(xx, {'numeric'}, {'nonempty'}, mfilename, 'xx');
+validateattributes(yy, {'numeric'}, {'size', size(xx)}, mfilename, 'yy');
+validateattributes(uu, {'numeric'}, {'size', size(xx)}, mfilename, 'uu');
+validateattributes(vv, {'numeric'}, {'size', size(xx)}, mfilename, 'vv');
+validateattributes(dist_sep, {'numeric'}, {'scalar', '>' 0, '<', 1}, ...
+    mfilename, 'dist_sep');
+validateattributes(dist_test, {'numeric'}, {'scalar', '>' 0, '<=', dist_sep}, ...
+    mfilename, 'dist_test');
+validateattributes(step_size, {'numeric'}, {'scalar', 'positive'}, ...
+    mfilename, 'step_size');
+validateattributes(max_num_vertex, {'numeric'}, {'scalar', 'positive', 'integer'}, ...
+    mfilename, 'max_num_vertex');
+validateattributes(verbose, {'numeric', 'logical'}, {'scalar', 'binary'}, ...
+    mfilename, 'verbose');
+
+% convert distance parameters from fractions to data units
+min_domain_range = min( range(xx(:)), range(yy(:)) ); 
+dist_sep = dist_sep*min_domain_range;
+dist_test = dist_test*min_domain_range;
 
 %% Compute stream line points
 
@@ -178,31 +200,6 @@ if nargout>1
         stream_tri.Points = [stream_tri.Points; stream_xy];
     end
 end
-
-function [] = sanity_check(xx, yy, uu, vv, dist_sep, dist_test, ...
-    step_size, verbose)
-% function [] = sanity_check(xx, yy, uu, vv, dist_sep, dist_test, ...
-%     step_size, get_dist, verbose)
-%
-% Check for valid inputs, fail with error if any are invalid
-% %
-
-validateattributes(xx, {'numeric'}, {'nonempty'}, ...
-    mfilename, 'xx');
-validateattributes(yy, {'numeric'}, {'size', size(xx)}, ...
-    mfilename, 'yy');
-validateattributes(uu, {'numeric'}, {'size', size(xx)}, ...
-    mfilename, 'uu');
-validateattributes(vv, {'numeric'}, {'size', size(xx)}, ...
-    mfilename, 'vv');
-validateattributes(dist_sep, {'numeric'}, {'scalar', 'positive'}, ...
-    mfilename, 'dist_sep');
-validateattributes(dist_test, {'numeric'}, {'scalar', 'positive', '<=', dist_sep}, ...
-    mfilename, 'dist_test');
-validateattributes(step_size, {'numeric'}, {'scalar', 'positive'}, ...
-    mfilename, 'step_size');
-validateattributes(verbose, {'numeric', 'logical'}, {'scalar', 'binary'}, ...
-    mfilename, 'verbose');
 
 function seed_xy = get_seed_candidates(xy, buf_dist)
 %
