@@ -1,19 +1,16 @@
-function [hl, ha] = even_streamline_arrow(xx, yy, uu, vv, d_sep, d_test, varargin)
-% function [hl, ha] = even_streamline_arrow(xx, yy, uu, vv, d_sep, d_test, varargin)
+function [hl, ha] = even_stream_arrow(xyld, varargin)
+% function [hl, ha] = even_stream_arrow(xyld, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1] with
 % arrow glyphs to indicate the flow direction. Uses the 'arrow' package by
-% Dr. Erik A. Johnson from the Mathworks FileExchange.
+% Dr. Erik A. Johnson from the Mathworks File Exchange, which is included
+% below.
 %
 % Arguments:
-%   xx, yy, uu, vv: Vector field x-coord, y-coord, vector x-component and
-%       vector y-component, respectively, sizes must match
-%   d_sep: Scalar, minimum distance between seed points and stream lines
-%   d_test: Scalar, minimum distance between stream lines
+%   xyld: Matrix with columns [x, y, len, dist], as produced by
+%       even_stream_data. Only the x and y columns are needed.
 %
 % Optional Parameters (Name - Value):
-%   'StepSize': stream line step size as in the built-in stream2, default = 0.1
-%   'Verbose': set true to enable verbose messages, default = false
 %   'LineStyle': line style, as in the plot(), default = '-'
 %   'LineWidth': line width, as in the plot(), default = 0.5
 %   'Color': line and arrow color, as in plot(), default = 'b'
@@ -35,43 +32,35 @@ function [hl, ha] = even_streamline_arrow(xx, yy, uu, vv, d_sep, d_test, varargi
 % %
 
 % handle inputs
-% NOTE: sanity checks are defered to child functions
 parser = inputParser;
 parser.CaseSensitive = false;
 parser.PartialMatching = false;
 parser.KeepUnmatched = false;
 
-parser.addParameter('stepsize', 0.1);
-parser.addParameter('verbose', false);
 parser.addParameter('LineStyle', '-');
 parser.addParameter('LineWidth', 0.5);
 parser.addParameter('Color', 'b');
 parser.addParameter('ArrowLength', 7);
 parser.addParameter('ArrowTipAngle', 20);
 parser.addParameter('ArrowBaseAngle', 45);
-parser.addParameter('ArrowSpacing', 5);
+parser.addParameter('ArrowSpace', 5);
 
 parser.parse(varargin{:});
-step_size = parser.Results.stepsize;
-verbose = parser.Results.verbose;
 line_style = parser.Results.LineStyle;
 line_width = parser.Results.LineWidth;
 color = parser.Results.Color;
 arrow_length = parser.Results.ArrowLength;
 arrow_tip_angle = parser.Results.ArrowTipAngle;
 arrow_base_angle = parser.Results.ArrowBaseAngle;
-arrow_spacing = parser.Results.ArrowSpacing;
-
-% get streamline data
-xy = get_stream_xy(xx, yy, uu, vv, d_sep, d_test, step_size, verbose);
+arrow_space = parser.Results.ArrowSpace;
 
 % plot lines
-hl = plot(xy(:,1), xy(:,2), ...
+hl = plot(xyld(:,1), xyld(:,2), ...
     'LineStyle', line_style, 'LineWidth', line_width, 'Color', color);
 
 % plot arrows
-xy_from = xy(arrow_spacing:arrow_spacing:end, :);
-xy_to = xy(1+arrow_spacing:arrow_spacing:end, :);
+xy_from = xyld(arrow_space:arrow_space:end, 1:2);
+xy_to = xyld(1+arrow_space:arrow_space:end, 1:2);
 xy_nan = any(isnan(xy_from), 2) | any(isnan(xy_to), 2);
 xy_from = xy_from(~xy_nan, :);
 xy_to = xy_to(~xy_nan, :);

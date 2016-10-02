@@ -23,20 +23,23 @@ hf.Name = mfilename;
 
 % normal lines
 ax = subplot(2,2,1);
-even_stream_line(xyld, 'LineWidth', 1, 'Color', 'k', 'LineStyle', '-');
+even_stream_line(xyld, 'LineWidth', 0.5, 'Color', 'k', 'LineStyle', '-');
 title('even\_stream\_line');
 ax.XTick = [];
 ax.YTick = [];
 
 % taper
 ax = subplot(2,2,2);
-even_stream_taper(xyld, 'LineWidthMin', 0.5, 'LineWidthMax', 3, 'Color', 'k');
+even_stream_taper(xyld, 'LineWidthMin', 0.5, 'LineWidthMax', 2, 'Color', 'k');
 title('even\_stream\_taper');
 ax.XTick = [];
 ax.YTick = [];
 
 % arrow
 ax = subplot(2,2,3);
+even_stream_arrow(xyld, 'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', ...
+    'ArrowLength', 2, 'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, ...
+    'ArrowSpace', 10);
 title('even\_stream\_arrow');
 ax.XTick = [];
 ax.YTick = [];
