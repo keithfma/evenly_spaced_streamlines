@@ -1,12 +1,14 @@
-function hh = even_stream_taper(xyd, varargin)
-% function hh = even_stream_taper(xyd, varargin)
+function hh = even_stream_taper(xy, dist, varargin)
+% function hh = even_stream_taper(xy, dist, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1] using the
 % line tapering effect.
 %
 % Arguments:
-%   xyd: Matrix with columns [x, y, dist], as produced by
-%       even_stream_data. All columns are needed.
+%   xy: Matrix with columns [x, y], containing streamline points, as
+%       produced by even_stream_data
+%   dist = Vector, containing distance to nearest neighboring streamline,
+%       as produced by even_stream_data
 %
 % Optional Parameters (Name - Value):
 %   'LineWidthMin': minimum line width as in the built-in plot(), default = 0.5
@@ -41,25 +43,25 @@ line_width_max = parser.Results.LineWidthMax;
 line_color = parser.Results.Color;
 
 % reformat streamlines as segments 
-num_segments = size(xyd,1)-2*sum(isnan(xyd(:,1)))-1;
+num_segments = size(xy,1)-2*sum(isnan(xy(:,1)))-1;
 x_segment = nan(num_segments, 2);
 y_segment = nan(num_segments, 2);
 d_segment = nan(num_segments, 1);
 current_segment = 0;
-for ii = 1:size(xyd,1)-1           
+for ii = 1:size(xy,1)-1           
     % skip line endpoints, nothing to plot
-    if any(isnan(xyd(ii,1:2))) || any(isnan(xyd(ii+1,1:2)))
+    if any(isnan(xy(ii,1:2))) || any(isnan(xy(ii+1,1:2)))
         continue
     end
     current_segment = current_segment+1;
-    x_segment(current_segment, :) = xyd(ii:ii+1,1);
-    y_segment(current_segment, :) = xyd(ii:ii+1,2);
-    d_segment(current_segment) = mean(xyd(ii:ii+1,3));
+    x_segment(current_segment, :) = xy(ii:ii+1,1);
+    y_segment(current_segment, :) = xy(ii:ii+1,2);
+    d_segment(current_segment) = mean(dist(ii:ii+1));
 end
 
 % get segment width rounded to 0.1 pt
-dist_max = max(xyd(:,3));
-dist_min = min(xyd(:,3));
+dist_max = max(dist);
+dist_min = min(dist);
 w_coef = max(0.001, min(1, (d_segment-dist_min)/(dist_max-dist_min)));
 w_segment = line_width_min+w_coef*(line_width_max-line_width_min);
 w_segment = round(10*w_segment)/10;

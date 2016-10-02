@@ -1,11 +1,10 @@
-function hh = even_stream_line(xyd, varargin)
-% function hh = even_stream_line(xyd, varargin)
+function hh = even_stream_line(xy, varargin)
+% function hh = even_stream_line(xy, varargin)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %
 % Arguments:
-%   xyd: Matrix with columns [x, y, len, dist], as produced by
-%       even_stream_data. Only the x and y columns are needed.
+%   xy: Matrix with columns [x, y], as produced by even_stream_data
 %
 % Optional Parameters (Name - Value):
 %   'LineStyle': line style as in plot(), default = '-'
@@ -40,5 +39,5 @@ line_width = parser.Results.LineWidth;
 line_color = parser.Results.Color;
 
 % create plot
-hh = plot(xyd(:,1), xyd(:,2), ...
+hh = plot(xy(:,1), xy(:,2), ...
     'LineStyle', line_style, 'LineWidth', line_width, 'Color', line_color);

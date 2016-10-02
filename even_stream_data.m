@@ -1,5 +1,5 @@
-function xyd = even_stream_data(xx, yy, uu, vv, varargin)
-% function xyd = even_stream_data(xx, yy, uu, vv, varargin)
+function [xy, dist] = even_stream_data(xx, yy, uu, vv, varargin)
+% function [xy, dist] = even_stream_data(xx, yy, uu, vv, varargin)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm [1].
 % Always returns streamline points. Optionally, return arc length
@@ -17,8 +17,6 @@ function xyd = even_stream_data(xx, yy, uu, vv, varargin)
 %       default = 2% minimum domain width
 %   'StepSize': Scalar, streamline step size, see streamline() for details,
 %       default = 0.1
-%   'GetDist': Set true to compute and return 'dist',
-%       default = false
 %   'Verbose': set true to enable verbose messages,
 %       default = false
 %
@@ -28,6 +26,8 @@ function xyd = even_stream_data(xx, yy, uu, vv, varargin)
 %       y-coord, and dist is the minimum distance to neighboring stream
 %       lines. 'dist' is computed only if 'GetDist' is set to true,
 %       respectively, otherwise, the column is set to NaN.
+%   dist: Vector, minimum distance to neighboring stream
+%       lines, only computed only if nargout>1.
 %
 % References:
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -47,18 +47,15 @@ parser.KeepUnmatched = false;
 parser.addParameter('DistSep', 0.05*min(range(xx(:)), range(yy(:))));
 parser.addParameter('DistTest', 0.02*min(range(xx(:)), range(yy(:))) );
 parser.addParameter('StepSize', 0.1);
-parser.addParameter('GetDist', false);
 parser.addParameter('Verbose', false);
 
 parser.parse(varargin{:});
 dist_sep = parser.Results.DistSep;
 dist_test = parser.Results.DistTest;
 step_size = parser.Results.StepSize;
-get_dist = parser.Results.GetDist;
 verbose = parser.Results.Verbose;
 
-sanity_check(xx, yy, uu, vv, dist_sep, dist_test, step_size, get_dist, ...
-    verbose);
+sanity_check(xx, yy, uu, vv, dist_sep, dist_test, step_size, verbose);
 
 %% Compute stream line points
 
@@ -161,7 +158,7 @@ warning('on', 'MATLAB:delaunayTriangulation:DupPtsWarnId');
 %% Compute distance to neighbors
 
 dist = nan(size(xy, 1), 1);
-if get_dist
+if nargout>1
     kk = 1;
     for ii = 1:num_lines
         if verbose
@@ -176,12 +173,8 @@ if get_dist
     end
 end
 
-%% Combine data for output
-
-xyd = [xy, dist];
-
 function [] = sanity_check(xx, yy, uu, vv, dist_sep, dist_test, ...
-    step_size, get_dist, verbose)
+    step_size, verbose)
 % function [] = sanity_check(xx, yy, uu, vv, dist_sep, dist_test, ...
 %     step_size, get_dist, verbose)
 %
@@ -202,8 +195,6 @@ validateattributes(dist_test, {'numeric'}, {'scalar', 'positive', '<=', dist_sep
     mfilename, 'dist_test');
 validateattributes(step_size, {'numeric'}, {'scalar', 'positive'}, ...
     mfilename, 'step_size');
-validateattributes(get_dist, {'numeric', 'logical'}, {'scalar', 'binary'}, ...
-    mfilename, 'get_dist');
 validateattributes(verbose, {'numeric', 'logical'}, {'scalar', 'binary'}, ...
     mfilename, 'verbose');
 

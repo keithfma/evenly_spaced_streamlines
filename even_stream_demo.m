@@ -38,7 +38,7 @@ dist_test = 0.5*dist_sep;
 
 % compute
 tic
-xyd = even_stream_data(xx, yy, dzdx, dzdy, ...
+xy = even_stream_data(xx, yy, dzdx, dzdy, ...
     'DistSep', dist_sep, 'DistTest', dist_test);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
@@ -46,7 +46,7 @@ fprintf('even_stream_data: %.3f s elapsed\n', toc);
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream line', mfilename);
-even_stream_line(xyd, 'LineWidth', 0.5, 'Color', 'k', 'LineStyle', '-');
+even_stream_line(xy, 'LineWidth', 0.5, 'Color', 'k', 'LineStyle', '-');
 title('even\_stream\_line');
 ax = gca;
 ax.XTick = [];
@@ -63,7 +63,7 @@ dist_test = 0.5*dist_sep;
 
 % compute
 tic
-xyd = even_stream_data(xx, yy, dzdx, dzdy, ...
+xy = even_stream_data(xx, yy, dzdx, dzdy, ...
     'DistSep', dist_sep, 'DistTest', dist_test);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
@@ -71,7 +71,7 @@ fprintf('even_stream_data: %.3f s elapsed\n', toc);
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream arrow', mfilename);
-even_stream_arrow(xyd, 'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', ...
+even_stream_arrow(xy, 'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', ...
     'ArrowLength', 5, 'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, ...
     'ArrowSpace', 10);
 title('even\_stream\_arrow');
@@ -90,15 +90,15 @@ dist_test = 0.5*dist_sep;
 
 % compute
 tic
-xyd = even_stream_data(xx, yy, dzdx, dzdy, ...
-    'DistSep', dist_sep, 'DistTest', dist_test, 'GetDist', true);
+[xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, ...
+    'DistSep', dist_sep, 'DistTest', dist_test);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
 % plot
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream taper', mfilename);
-even_stream_taper(xyd, 'LineWidthMin', 0.5, 'LineWidthMax', 2, 'Color', 'k');
+even_stream_taper(xy, dist, 'LineWidthMin', 0.5, 'LineWidthMax', 2, 'Color', 'k');
 title('even\_stream\_taper');
 ax = gca;
 ax.XTick = [];
@@ -111,12 +111,12 @@ fprintf('even_stream_taper: %.3f s elapsed\n', toc);
 % line-integral-convilution (LIC) method for visualizing flow fields.
 
 % parameters
-dist_sep = 0.01*range(vv);
+dist_sep = 0.003*range(vv);
 dist_test = 0.5*dist_sep;
 
 % compute
 tic
-xyd = even_stream_data(xx, yy, dzdx, dzdy, ...
+xy = even_stream_data(xx, yy, dzdx, dzdy, ...
     'DistSep', dist_sep, 'DistTest', dist_test);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
@@ -124,7 +124,7 @@ fprintf('even_stream_data: %.3f s elapsed\n', toc);
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream texture', mfilename);
-even_stream_texture(xyd, 'LineWidth', 1, 'Period', 40);
+even_stream_texture(xy, 'LineWidth', 1, 'Period', 20);
 title('even\_stream\_texture');
 ax = gca;
 ax.XTick = [];
