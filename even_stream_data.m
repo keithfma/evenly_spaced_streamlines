@@ -7,8 +7,10 @@ function [xy, dist] = even_stream_data(xx, yy, uu, vv, varargin)
 % lines.
 %
 % Arguments:
-%   xx, yy: Vector field x-coord, y-coord
-%   uu, vv: Vector field x-component and y-component
+%   xx, yy: Matrices or vectors, x-coord and y-coord. If matrices, the
+%       size must match uu and vv. If vectors, xx must match the number of
+%       columns in uu and vv, and yy must match the number of rows.
+%   uu, vv: Matrices, vector field x-component and y-component
 %
 % Optional Parameters (Name - Value):
 %   'DistSep': Scalar, minimum distance between seed point and streamlines,
@@ -54,6 +56,10 @@ dist_sep = parser.Results.DistSep;
 dist_test = parser.Results.DistTest;
 step_size = parser.Results.StepSize;
 verbose = parser.Results.Verbose;
+
+if (isvector(xx) && isvector(yy)) && ~isvector(uu)
+    [xx, yy] = meshgrid(xx, yy);
+end
 
 sanity_check(xx, yy, uu, vv, dist_sep, dist_test, step_size, verbose);
 
