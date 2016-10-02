@@ -30,8 +30,8 @@ ax.YTick = [];
 
 % taper
 ax = subplot(2,2,2);
+even_stream_taper(xyld, 'LineWidthMin', 0.5, 'LineWidthMax', 3, 'Color', 'k');
 title('even\_stream\_taper');
-even_stream_taper(xyld);
 ax.XTick = [];
 ax.YTick = [];
 

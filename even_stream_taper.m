@@ -13,7 +13,6 @@ function hh = even_stream_taper(xyld, varargin)
 %   'LineWidthMax': maximum line width as in the built-in plot(), default = 2
 %   'LineStyle': line style as in the built-in plot(), default = '-'
 %   'Color': line color as in the built-in plot(), default = 'b'
-%   'Verbose': set true to enable verbose messages, default = false
 %
 % Returns:
 %   hh = Graphics object for streamlines
@@ -34,16 +33,12 @@ parser.KeepUnmatched = false;
 
 parser.addParameter('LineWidthMin', 0.5);
 parser.addParameter('LineWidthMax', 2);
-parser.addParameter('LineStyle', '-');
 parser.addParameter('Color', 'b');
-parser.addParameter('Verbose', false);
 
 parser.parse(varargin{:});
 line_width_min = parser.Results.LineWidthMin;
 line_width_max = parser.Results.LineWidthMax;
-line_style = parser.Results.LineStyle;
 line_color = parser.Results.Color;
-verbose = parser.Results.Verbose;
 
 % reformat streamlines as segments 
 num_segments = size(xyld,1)-2*sum(isnan(xyld(:,1)))-1;
@@ -62,11 +57,10 @@ for ii = 1:size(xyld,1)-1
     d_segment(current_segment) = mean(xyld(ii:ii+1,4));
 end
 
-keyboard
-% START HERE
-
 % get segment width rounded to 0.1 pt
-w_coef = max(0.001, min(1, (d_segment-d_test)/(d_sep-d_test)));
+dist_max = max(xyld(:,4));
+dist_min = min(xyld(:,4));
+w_coef = max(0.001, min(1, (d_segment-dist_min)/(dist_max-dist_min)));
 w_segment = line_width_min+w_coef*(line_width_max-line_width_min);
 w_segment = round(10*w_segment)/10;
 
@@ -86,7 +80,7 @@ for ii = 1:num_unique_widths
     y_segment_ww(1:3:end) = y_segment(is_ww, 1);
     y_segment_ww(2:3:end) = y_segment(is_ww, 2);    
     % plot all segments at once
-    hh(ii) = plot(x_segment_ww, y_segment_ww, ...
-        'LineStyle', line_style, 'LineWidth', ww, 'Color', line_color);   
+    hh(ii) = plot(x_segment_ww, y_segment_ww, ... 
+        'LineWidth', ww, 'Color', line_color);   
     hold on
 end
