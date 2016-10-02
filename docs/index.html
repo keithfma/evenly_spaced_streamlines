@@ -84,13 +84,10 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 </pre><img vspace="5" hspace="5" src="even_stream_demo_01.png" style="width:560px;height:420px;" alt=""> <h2>Plot stream lines<a name="2"></a></h2><p>Compute streamlines and plot using a simple line style.</p><pre class="codeinput"><span class="comment">% parameters</span>
-dist_sep = 0.05*range(vv);
-dist_test = 0.5*dist_sep;
 
 <span class="comment">% compute</span>
 tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, <span class="keyword">...</span>
-    <span class="string">'DistSep'</span>, dist_sep, <span class="string">'DistTest'</span>, dist_test);
+xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
 fprintf(<span class="string">'even_stream_data: %.3f s elapsed\n'</span>, toc);
 
 <span class="comment">% plot</span>
@@ -103,16 +100,11 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_line: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 0.645 s elapsed
-even_stream_line: 0.050 s elapsed
-</pre><img vspace="5" hspace="5" src="even_stream_demo_02.png" style="width:560px;height:420px;" alt=""> <h2>Plot stream lines with arrow glyphs<a name="3"></a></h2><p>Compute streamlines and plot lines with arrow glyphs to indicate flow direction.</p><pre class="codeinput"><span class="comment">% parameters</span>
-dist_sep = 0.05*range(vv);
-dist_test = 0.5*dist_sep;
-
-<span class="comment">% compute</span>
+</pre><pre class="codeoutput">even_stream_data: 0.674 s elapsed
+even_stream_line: 0.052 s elapsed
+</pre><img vspace="5" hspace="5" src="even_stream_demo_02.png" style="width:560px;height:420px;" alt=""> <h2>Plot stream lines with arrow glyphs<a name="3"></a></h2><p>Compute streamlines and plot lines with arrow glyphs to indicate flow direction.</p><pre class="codeinput"><span class="comment">% compute</span>
 tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, <span class="keyword">...</span>
-    <span class="string">'DistSep'</span>, dist_sep, <span class="string">'DistTest'</span>, dist_test);
+xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
 fprintf(<span class="string">'even_stream_data: %.3f s elapsed\n'</span>, toc);
 
 <span class="comment">% plot</span>
@@ -127,16 +119,11 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_arrow: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 1.035 s elapsed
-even_stream_arrow: 0.371 s elapsed
-</pre><img vspace="5" hspace="5" src="even_stream_demo_03.png" style="width:560px;height:420px;" alt=""> <h2>Plot tapered stream lines<a name="4"></a></h2><p>Plot stream lines with tapering effect, such that line width scales with the distance to the nearest neighboring streamline.</p><pre class="codeinput"><span class="comment">% parameters</span>
-dist_sep = 0.05*range(vv);
-dist_test = 0.5*dist_sep;
-
-<span class="comment">% compute</span>
+</pre><pre class="codeoutput">even_stream_data: 0.714 s elapsed
+even_stream_arrow: 0.435 s elapsed
+</pre><img vspace="5" hspace="5" src="even_stream_demo_03.png" style="width:560px;height:420px;" alt=""> <h2>Plot tapered stream lines<a name="4"></a></h2><p>Plot stream lines with tapering effect, such that line width scales with the distance to the nearest neighboring streamline.</p><pre class="codeinput"><span class="comment">% compute</span>
 tic
-[xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, <span class="keyword">...</span>
-    <span class="string">'DistSep'</span>, dist_sep, <span class="string">'DistTest'</span>, dist_test);
+[xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
 fprintf(<span class="string">'even_stream_data: %.3f s elapsed\n'</span>, toc);
 
 <span class="comment">% plot</span>
@@ -149,16 +136,15 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_taper: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 1.598 s elapsed
-even_stream_taper: 0.110 s elapsed
+</pre><pre class="codeoutput">even_stream_data: 1.612 s elapsed
+even_stream_taper: 0.134 s elapsed
 </pre><img vspace="5" hspace="5" src="even_stream_demo_04.png" style="width:560px;height:420px;" alt=""> <h2>Plot textured stream lines<a name="5"></a></h2><p>Plot streamlines with texture effect. This is most effective with closely-spaced streamlines, in which case it mimics the popular line-integral-convilution (LIC) method for visualizing flow fields.</p><pre class="codeinput"><span class="comment">% parameters</span>
 dist_sep = 0.003*range(vv);
 dist_test = 0.5*dist_sep;
 
 <span class="comment">% compute</span>
 tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, <span class="keyword">...</span>
-    <span class="string">'DistSep'</span>, dist_sep, <span class="string">'DistTest'</span>, dist_test);
+xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
 fprintf(<span class="string">'even_stream_data: %.3f s elapsed\n'</span>, toc);
 
 <span class="comment">% plot</span>
@@ -171,8 +157,8 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_texture: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 230.100 s elapsed
-even_stream_texture: 0.630 s elapsed
+</pre><pre class="codeoutput">even_stream_data: 236.974 s elapsed
+even_stream_texture: 0.592 s elapsed
 </pre><img vspace="5" hspace="5" src="even_stream_demo_05.png" style="width:560px;height:420px;" alt=""> <h2>References<a name="6"></a></h2><div><ol><li>Jobard, B., &amp; Lefer, W. (1997). Creating Evenly-Spaced Streamlines of   Arbitrary Density. In W. Lefer &amp; M. Grave (Eds.), Visualization in   Scientific Computing ?97: Proceedings of the Eurographics Workshop in   Boulogne-sur-Mer France, April 28--30, 1997 (pp. 43?55). inbook,   Vienna: Springer Vienna. <a href="http://doi.org/10.1007/978-3-7091-6876-9_5">http://doi.org/10.1007/978-3-7091-6876-9_5</a></li></ol></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Evenly Spaced Streamlines
@@ -210,13 +196,10 @@ ax.YTick = [];
 % Compute streamlines and plot using a simple line style.
 
 % parameters
-dist_sep = 0.05*range(vv);
-dist_test = 0.5*dist_sep;
 
 % compute
 tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, ...
-    'DistSep', dist_sep, 'DistTest', dist_test);
+xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
 % plot
@@ -234,14 +217,9 @@ fprintf('even_stream_line: %.3f s elapsed\n', toc);
 % Compute streamlines and plot lines with arrow glyphs to indicate flow
 % direction. 
 
-% parameters
-dist_sep = 0.05*range(vv);
-dist_test = 0.5*dist_sep;
-
 % compute
 tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, ...
-    'DistSep', dist_sep, 'DistTest', dist_test);
+xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
 % plot
@@ -261,14 +239,9 @@ fprintf('even_stream_arrow: %.3f s elapsed\n', toc);
 % Plot stream lines with tapering effect, such that line width scales with
 % the distance to the nearest neighboring streamline.
 
-% parameters
-dist_sep = 0.05*range(vv);
-dist_test = 0.5*dist_sep;
-
 % compute
 tic
-[xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, ...
-    'DistSep', dist_sep, 'DistTest', dist_test);
+[xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
 % plot
@@ -293,8 +266,7 @@ dist_test = 0.5*dist_sep;
 
 % compute
 tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, ...
-    'DistSep', dist_sep, 'DistTest', dist_test);
+xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
 % plot
@@ -307,7 +279,6 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf('even_stream_texture: %.3f s elapsed\n', toc);
-
 
 %% References
 % # Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
