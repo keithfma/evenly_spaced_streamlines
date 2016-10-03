@@ -59,9 +59,12 @@ hl = plot(xy(:,1), xy(:,2), ...
     'LineStyle', line_style, 'LineWidth', line_width, 'Color', color);
 
 % plot arrows
-% TODO: debug occasional error at line 66
 xy_from = xy(arrow_space:arrow_space:end, 1:2);
 xy_to = xy(1+arrow_space:arrow_space:end, 1:2);
+if size(xy_from,1) > size(xy_to,1) % bugfix: xy_to is shorter in rare cases
+    fprintf('FIXED BUG!\n');
+    xy_from(end,:) = []; 
+end
 xy_nan = any(isnan(xy_from), 2) | any(isnan(xy_to), 2);
 xy_from = xy_from(~xy_nan, :);
 xy_to = xy_to(~xy_nan, :);
