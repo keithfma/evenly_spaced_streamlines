@@ -1,12 +1,13 @@
 function hh = even_stream_line(xy, varargin)
-% function hh = even_stream_line(xy, varargin)
+% function hh = even_stream_line(xy)
+% function hh = even_stream_line(___, Name, Value)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1]
 %
 % Arguments:
 %   xy: Matrix with columns [x, y], as produced by even_stream_data
 %
-% Optional Parameters (Name - Value):
+% Optional Parameters (Name, Value):
 %   'LineStyle': line style as in plot(), default = '-'
 %   'LineWidth': line width as in plot(), default = 0.5
 %   'Color': line color as in plot(), default = 'b'

@@ -1,6 +1,6 @@
-function [xy, len, dist] = even_stream_data(xx, yy, uu, vv, dist_sep, dist_test, varargin)
-% [xy, len, dist] = even_stream_data(xx, yy, uu, vv, dist_sep, dist_test)
-% [xy, len, dist] = even_stream_data(___, Name, Value)
+function [xy, dist] = even_stream_data(xx, yy, uu, vv, dist_sep, dist_test, varargin)
+% [xy, dist] = even_stream_data(xx, yy, uu, vv, dist_sep, dist_test)
+% [xy, dist] = even_stream_data(___, Name, Value)
 %
 % Compute evenly-spaced streamlines with Jobar & Lefer algorithm [1].
 % Always returns streamline points. Optionally, return arc length
@@ -29,10 +29,8 @@ function [xy, len, dist] = even_stream_data(xx, yy, uu, vv, dist_sep, dist_test,
 % Return:
 %   xy: Matrix, [x, y] coordinates for stream line points, each row is a
 %       point, individual lines are separated by NaNs.
-%   len: Vector, arc length (distance along line) for each streamline, only
-%       computed if nargout >= 2
 %   dist: Vector, minimum distance to neighboring stream lines, only
-%       computed only if nargout == 3.
+%       computed only if nargout == 2.
 %
 % References:
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -185,25 +183,9 @@ end
 % enable nuisance warning(s)
 warning('on', 'MATLAB:delaunayTriangulation:DupPtsWarnId');
 
-%% Compute arc length
-
-if nargout >= 2
-    len = nan(size(xy, 1), 1);
-    kk = 1;
-    for ii = 1:num_lines
-        if verbose
-            fprintf('%s: len: line %d of %d\n', mfilename, ii, num_lines);
-        end
-        this_xy = xy(kk:kk+stream_len(ii)-1, :);
-        this_len = [0; cumsum(sqrt(sum(diff(this_xy).^2, 2)))];
-        len(kk:kk+stream_len(ii)-1) = this_len;
-        kk = kk+stream_len(ii)+1;
-    end
-end
-
 %% Compute distance to neighbors
 
-if nargout == 3
+if nargout == 2
     dist = nan(size(xy, 1), 1);
     kk = 1;
     for ii = 1:num_lines

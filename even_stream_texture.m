@@ -1,5 +1,6 @@
 function hh = even_stream_texture(xy, varargin)
-% function hh = even_stream_texture(xy, varargin)
+% function hh = even_stream_texture(xy)
+% function hh = even_stream_texture(___, Name, Value)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1] using the
 % texturing effect to produce results similar to the line integral
@@ -9,7 +10,7 @@ function hh = even_stream_texture(xy, varargin)
 %   xy: Matrix with columns [x, y], containing streamline points as
 %       produced by even_stream_data.
 %
-% Optional Parameters (Name - Value):
+% Optional Parameters (Name, Value):
 %   'LineWidth': line width, as in the plot(), default = 0.5
 %   'Period': length of periodic pattern in # points, default = 20;
 %   

@@ -65,7 +65,7 @@ hf = figure;
 hf.Name = sprintf('%s: even stream arrow', mfilename);
 even_stream_arrow(xy, 'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', ...
     'ArrowLength', 5, 'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, ...
-    'ArrowSpace', 10);
+    'ArrowSpace', 0.05*range(vv));
 title('even\_stream\_arrow');
 ax = gca;
 ax.XTick = [];
@@ -97,13 +97,10 @@ fprintf('even_stream_taper: %.3f s elapsed\n', toc);
 % closely-spaced streamlines, in which case it mimics the popular
 % line-integral-convilution (LIC) method for visualizing flow fields.
 
-% parameters
-dist_sep = 0.003*range(vv);
-dist_test = 0.5*dist_sep;
-
 % compute
 tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
+% xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
+xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
 % plot

@@ -1,5 +1,6 @@
 function hh = even_stream_taper(xy, dist, varargin)
-% function hh = even_stream_taper(xy, dist, varargin)
+% function hh = even_stream_taper(xy, dist)
+% function hh = even_stream_taper(___, Name, Value)
 %
 % Plot evenly-spaced streamlines with Jobar & Lefer algorithm [1] using the
 % line tapering effect.
@@ -10,7 +11,7 @@ function hh = even_stream_taper(xy, dist, varargin)
 %   dist = Vector, containing distance to nearest neighboring streamline,
 %       as produced by even_stream_data
 %
-% Optional Parameters (Name - Value):
+% Optional Parameters (Name, Value):
 %   'LineWidthMin': minimum line width as in the built-in plot(), default = 0.5
 %   'LineWidthMax': maximum line width as in the built-in plot(), default = 2
 %   'LineStyle': line style as in the built-in plot(), default = '-'
