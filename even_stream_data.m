@@ -91,17 +91,17 @@ dist_test = dist_test*min_domain_range;
 % ...Delaunay triangulation drops duplicate points from streamlines, OK
 warning('off', 'MATLAB:delaunayTriangulation:DupPtsWarnId');
 
-% select random non-NaN grid point for initial seed
+% get first streamline from random grid point
 while 1
     kk = randi([1, numel(xx)]);
-    if ~isnan(uu(kk)) && ~isnan(vv(kk))
+    seed_xy = [xx(kk), yy(kk)];
+    [stream_xy, ~] = get_streamline(xx, yy, uu, vv, seed_xy, step_size);
+    if ~isempty(stream_xy)
         break
     end
 end
-seed_xy = [xx(kk), yy(kk)];
 
 % add first streamline to triangulation and length list
-[stream_xy, ~] = get_streamline(xx, yy, uu, vv, seed_xy, step_size);
 stream_tri = delaunayTriangulation(stream_xy);
 stream_len = size(stream_tri.Points,1);
 
@@ -224,11 +224,12 @@ seed_xy = [midpoint + buf_dist*normal; midpoint - buf_dist*normal];
 
 function [stream_xy, seed_idx] = get_streamline(xx, yy, uu, vv, seed_xy, step_size)
 %
-% Compute streamline in both directions starting at seed point
+% Compute streamline in both directions starting at seed point. Returns []
+% if no stream line can be created at the seed point.
 %
 % Arguments:
-%   xx, yy:
-%   uu, vv:
+%   xx, yy: x-coord and y-coord for vector field 
+%   uu, vv: x-component and y-component of vectors
 %   seed_xy: Vector, [x, y] coordinates of seed point
 %   stream_xy : Matrix, stream line x- and y-coordinates in rows, returns [] if
 %       stream line has zero length
