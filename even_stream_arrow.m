@@ -18,7 +18,7 @@ function [hl, ha] = even_stream_arrow(xy, varargin)
 %   'ArrowLength': arrow head length in pixels, default = 20
 %   'ArrowTipAngle': arrow head tip angle in degrees, default = 20
 %   'ArrowBaseAngle': arrow head base angle in degrees, default = 10
-%   'ArrowSpace': arrow head spacing along line in coordinate unite, 
+%   'ArrowSpace': arrow head spacing along line in data coordinate units, 
 %       default = 5% of minimum coordinate axis range
 %   
 % Returns:

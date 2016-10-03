@@ -99,15 +99,14 @@ fprintf('even_stream_taper: %.3f s elapsed\n', toc);
 
 % compute
 tic
-% xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
+xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
 fprintf('even_stream_data: %.3f s elapsed\n', toc);
 
 % plot
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream texture', mfilename);
-even_stream_texture(xy, 'LineWidth', 1, 'Period', 20);
+even_stream_texture(xy, 'LineWidth', 1, 'Period', 0.020*range(vv));
 title('even\_stream\_texture');
 ax = gca;
 ax.XTick = [];

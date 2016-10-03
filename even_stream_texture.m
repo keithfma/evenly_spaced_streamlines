@@ -12,7 +12,8 @@ function hh = even_stream_texture(xy, varargin)
 %
 % Optional Parameters (Name, Value):
 %   'LineWidth': line width, as in the plot(), default = 0.5
-%   'Period': length of periodic pattern in # points, default = 20;
+%   'Period': length of periodic pattern in data coordinate spacing, 
+%       default = 20% of minimum coordinate axis range
 %   
 % Returns:
 %   hh = Vector of graphics objects for streamlines
@@ -32,14 +33,18 @@ parser.PartialMatching = false;
 parser.KeepUnmatched = false;
 
 parser.addParameter('LineWidth', 0.5);
-parser.addParameter('Period', 20);
+parser.addParameter('Period', 0.20*min(range(xy)));
 
 parser.parse(varargin{:});
 line_width = parser.Results.LineWidth;
 period = parser.Results.Period;
 
-validateattributes(period, {'numeric'}, {'scalar', 'positive', 'integer'}, ...
+validateattributes(period, {'numeric'}, {'scalar', 'positive'}, ...
     mfilename, 'period');
+
+% convert period to approximate number of points
+mean_segment_length = nanmean(sqrt(sum(diff(xy).^2, 2)));
+period = round(period/mean_segment_length);
 
 % reformat streamlines as segments 
 num_segments = size(xy, 1)-2*sum(isnan(xy(:,1)))-1;
