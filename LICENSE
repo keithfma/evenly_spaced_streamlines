@@ -1,6 +1,6 @@
 --------------------------------------------------
 BEGIN LICENSE FOR EVENLY SPACED STREAMLINE PACKAGE
-APPLIES TO: everything *except* the arrow() function in even_stream_arrow.m
+APPLIES TO: everything *except* arrow.m 
 
 MIT License
 
@@ -29,7 +29,7 @@ END LICENSE FOR EVENLY SPACED STREAMLINE PACKAGE
 
 --------------------------------
 BEGIN LICENSE FOR ARROW PACKAGE
-APPLIES TO: arrow() function in even_stream_arrow.m only
+APPLIES TO: arrow.m only
 
 Copyright (c) 2016, Erik A Johnson
 All rights reserved.

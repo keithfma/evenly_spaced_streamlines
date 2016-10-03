@@ -64,7 +64,7 @@ tic
 hf = figure;
 hf.Name = sprintf('%s: even stream arrow', mfilename);
 even_stream_arrow(xy, 'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', ...
-    'ArrowLength', 5, 'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, ...
+    'ArrowLength', 4, 'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, ...
     'ArrowSpace', 0.05*range(vv));
 title('even\_stream\_arrow');
 ax = gca;
@@ -106,7 +106,7 @@ fprintf('even_stream_data: %.3f s elapsed\n', toc);
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream texture', mfilename);
-even_stream_texture(xy, 'LineWidth', 1, 'Period', 0.020*range(vv));
+even_stream_texture(xy, 'LineWidth', 2, 'Period', 0.20*range(vv));
 title('even\_stream\_texture');
 ax = gca;
 ax.XTick = [];
