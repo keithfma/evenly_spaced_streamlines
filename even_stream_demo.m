@@ -106,7 +106,7 @@ fprintf('even_stream_data: %.3f s elapsed\n', toc);
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream texture', mfilename);
-even_stream_texture(xy, 'LineWidth', 2, 'Period', 0.20*range(vv));
+even_stream_texture(xy, 'LineWidth', 1, 'Period', 0.20*range(vv));
 title('even\_stream\_texture');
 ax = gca;
 ax.XTick = [];
