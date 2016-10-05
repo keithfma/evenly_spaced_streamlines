@@ -57,25 +57,13 @@ validateattributes(min_density, {'numeric'}, {'scalar', '>' 0}, ...
 validateattributes(max_density, {'numeric'}, {'scalar', '>' 0}, ...
     mfilename, 'max_density');
 
-% compute stream line points
-stream_cell = get_stream_xy(xx, yy, uu, vv, min_density, max_density);
-
-%<TEMP> convert cell array to NaN-separated matrix
-num_lines = length(stream_cell);
-stream_sep = cell(1, num_lines);
-[stream_sep{:}] = deal(nan(1,2));
-stream_cell = reshape([stream_cell; stream_sep], 2*num_lines, 1);
-xy = cell2mat(stream_cell);
-%<TEMP>
-
-% compute distance to neighbors
- 
+% compute results
+xy = get_stream_xy(xx, yy, uu, vv, min_density, max_density);
 if nargout == 2
     dist = get_stream_dist(xy);
 end
 
-
-function vertsout = get_stream_xy(x, y, u, v, min_density, max_density)
+function xy = get_stream_xy(x, y, u, v, min_density, max_density)
 % Return streamline vertices
 % 
 % Modified from Mathworks nicestreams() in streamlines.m
@@ -123,7 +111,7 @@ endgrid = zeros(nrend,ncend);
 
 [r, c] = meshgrid(1:nrstart, 1:ncstart);
 rc = [r(:) c(:)];
-rc = rc(randperm(size(rc,1)),:); % DEBUG
+rc = rc(randperm(size(rc,1)),:); % randomize seed points
 
 for k = 1:size(rc,1)
     %if mod(k,100)==0, disp([num2str(k) '/' num2str(size(rc,1))]), end
@@ -193,9 +181,13 @@ for k = 1:size(rc,1)
             vo{q} = vv(1:j-1,:);
             
         end
-        vertsout{end+1} = [flipud(vo{2}); vo{1}(2:end,:)];
-    end
+        vertsout{end+1} = [flipud(vo{2}); vo{1}(2:end,:)]; %#ok!
+        vertsout{end+1} = [NaN, NaN]; %#ok! add NaNs to separate lines
+    end    
 end
+
+% reformat cell array as single matrix with NaNs separating lines
+xy = cell2mat(vertsout');
 
 function dist = get_stream_dist(xy)
 % Return distance to nearest vertex in neighboring streamline for all
