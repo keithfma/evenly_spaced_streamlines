@@ -90,16 +90,13 @@ fprintf('even_stream_taper: %.3f s elapsed\n', toc);
 % closely-spaced streamlines, in which case it mimics the popular
 % line-integral-convilution (LIC) method for visualizing flow fields.
 
-% compute
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
-fprintf('even_stream_data: %.3f s elapsed\n', toc);
+close all
 
 % plot
-tic
 hf = figure;
 hf.Name = sprintf('%s: even stream texture', mfilename);
-even_stream_texture(xy, 'LineWidth', 1, 'Period', 0.20*range(vv));
+xy = even_stream_texture(xx, yy, dzdx, dzdy, 20, 40, ...
+    'LineWidth', 1, 'Period', 1);
 title('even\_stream\_texture');
 ax = gca;
 ax.XTick = [];

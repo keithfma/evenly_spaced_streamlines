@@ -35,7 +35,7 @@ function [xy, hl, ha] = even_stream_arrow(varargin)
 %   'ArrowLength': arrow head length in pixels, default = 20
 %   'ArrowTipAngle': arrow head tip angle in degrees, default = 20
 %   'ArrowBaseAngle': arrow head base angle in degrees, default = 10
-%   'ArrowDensity': arrow head spacing along line in arbitrary units, default
+%   'ArrowDensity': arrow head density in arbitrary units, default
 %       is 1, higher values will produce more closey spaced arrows
 %  
 % References: 
