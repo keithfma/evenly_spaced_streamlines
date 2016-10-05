@@ -63,7 +63,7 @@ end
 
 % get colormap
 num_colors = 256;
-colors = flipud(gray(num_colors));
+colors = gray(num_colors);
 
 % get colormap index for each segment
 idx = (1:num_segments)';
