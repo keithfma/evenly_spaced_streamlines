@@ -30,8 +30,6 @@ function [xy, hh] = even_stream_line(varargin)
 %   'LineWidth': line width as in plot(), default = 0.5
 %   'Color': line color as in plot(), default = 'b'
 %
-% Returns:
-%  
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
 %   Arbitrary Density. In W. Lefer & M. Grave (Eds.), Visualization in
@@ -44,7 +42,7 @@ function [xy, hh] = even_stream_line(varargin)
 %   uu = cos(xx).*yy;
 %   vv = sin(xx).*yy;
 %   subplot(1,2,1)
-%   xy = even_stream_line(xx, yy, uu, vv, 1, 2, 'Color', 'b');
+%   xy = even_stream_line(xx, yy, uu, vv, 2, 4, 'Color', 'b');
 %   subplot(1,2,2)
 %   even_stream_line(xy, 'Color', 'r');
 % %
@@ -64,7 +62,6 @@ parser.addOptional('max_density', []);
 parser.addParameter('LineStyle', '-');
 parser.addParameter('LineWidth', 0.5);
 parser.addParameter('Color', 'b');
-parser.addParameter('Verbose', false);
 
 parser.parse(varargin{:});
 xx_or_xy = parser.Results.xx_or_xy;

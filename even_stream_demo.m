@@ -39,8 +39,6 @@ ax.YTick = [];
 % control over the maximum streamline density and better results for high
 % streamline densities.
 
-close all
-
 tic
 hf = figure;
 hf.Name = sprintf('%s: even_stream_line', mfilename);
@@ -55,18 +53,12 @@ fprintf('even_stream_line: %.3f s elapsed\n', toc);
 % Compute streamlines and plot lines with arrow glyphs to indicate flow
 % direction. 
 
-% compute
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf('even_stream_data: %.3f s elapsed\n', toc);
-
-% plot
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream arrow', mfilename);
-even_stream_arrow(xy, 'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', ...
-    'ArrowLength', 4, 'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, ...
-    'ArrowSpace', 0.05*range(vv));
+even_stream_arrow(xx, yy, dzdx, dzdy, 2, 4, ...
+    'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', 'ArrowLength', 4, ...
+    'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, 'ArrowSpace', 2);
 title('even\_stream\_arrow');
 ax = gca;
 ax.XTick = [];
