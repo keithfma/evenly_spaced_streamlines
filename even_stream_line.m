@@ -1,12 +1,12 @@
-function [hh, xy] = pretty_stream_simple(varargin)
+function [xy, hh] = even_stream_line(varargin)
 % Compute and plot evenly-spaced streamlines for a vector field
 %
-% pretty_stream_simple(xx, yy, uu, vv)
-% pretty_stream_simple(xx, yy, uu, vv, min_density)
-% pretty_stream_simple(xx, yy, uu, vv, min_density, max_density)
-% pretty_stream_simple(xy)
-% pretty_stream_simple(..., Name, Value)
-% [hh, xy] = pretty_stream_simple(...)
+% even_stream_line(xx, yy, uu, vv)
+% even_stream_line(xx, yy, uu, vv, min_density)
+% even_stream_line(xx, yy, uu, vv, min_density, max_density)
+% even_stream_line(xy)
+% even_stream_line(..., Name, Value)
+% [xy, hh] = even_stream_line(...)
 %
 % Arguments:
 %   xx, yy: Matrices or vectors, x-coord and y-coord. If matrices, the
@@ -44,9 +44,9 @@ function [hh, xy] = pretty_stream_simple(varargin)
 %   uu = cos(xx).*yy;
 %   vv = sin(xx).*yy;
 %   subplot(1,2,1)
-%   [~, xy] = pretty_stream_simple(xx, yy, uu, vv, 2, 'Color', 'b');
+%   xy = even_stream_line(xx, yy, uu, vv, 1, 2, 'Color', 'b');
 %   subplot(1,2,2)
-%   pretty_stream_simple(xy, 'Color', 'r');
+%   even_stream_line(xy, 'Color', 'r');
 % %
 
 % handle inputs
@@ -57,8 +57,8 @@ parser.KeepUnmatched = false;
 
 parser.addRequired('xx_or_xy');
 parser.addOptional('yy', []);
-parser.addOptional('vv', []);
 parser.addOptional('uu', []);
+parser.addOptional('vv', []);
 parser.addOptional('min_density', []);
 parser.addOptional('max_density', []);
 parser.addParameter('LineStyle', '-');

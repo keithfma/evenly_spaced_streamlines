@@ -1,13 +1,12 @@
-%% Pretty Streamlines
+%% Evenly Spaced Streamlines
 % This package plots evenly spaced streamlines for a 2D vector in several
 % styles described in Jobar & Lefer, 1997 [1]. Four types of plots are
-% included: simple, arrow, taper, texture. The heavy-lifting of computing
-% evenly-spaced streamlines is handled by the built-in streamslice()
-% function, which uses an algorithm quite similar to [1]. 
+% included: line, arrow, taper, texture. 
 % 
-% Calculations can be slow for dense streamlines, so each plotting function
-% returns streamline data, and can re-use this data to plot with different
-% parameters.
+% The heavy-lifting of computing evenly-spaced streamlines is handled by a
+% modified version of streamslice() function, which uses an algorithm quite
+% similar to [1]. The modifications provide more control over streamline
+% spacing, and improved settings for high stream line densities.
 %
 % In the remainder of this document, each type of plot is genereated for an
 % example vector field.
@@ -36,19 +35,19 @@ ax.YTick = [];
 
 %% Simple stream lines
 % Plot evenly spaced streamlines using a simple line style. This function
-% is really just a thin wrapper around the built-in streamslice(). It is
-% included mainly for completeness - i.e. so that it is possible to make a
-% simple plot as well a more complicated "pretty" plot.
+% is quite similar to the Mathworks function streamslice(), with added
+% control over the maximum streamline density and better results for high
+% streamline densities.
 
 tic
 hf = figure;
-hf.Name = sprintf('%s: pretty_stream_line', mfilename);
-pretty_stream_line(xx, yy, dzdx, dzdy, 1, 'Color', 'k', 'LineWidth', 1);
-title('pretty\_stream\_simple');
+hf.Name = sprintf('%s: even_stream_line', mfilename);
+even_stream_line(xx, yy, dzdx, dzdy, 2, 4, 'Color', 'k', 'LineWidth', 1);
+title('even\_stream\_line');
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
-fprintf('pretty_stream_line: %.3f s elapsed\n', toc);
+fprintf('even_stream_line: %.3f s elapsed\n', toc);
 
 %% Plot stream lines with arrow glyphs 
 % Compute streamlines and plot lines with arrow glyphs to indicate flow

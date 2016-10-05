@@ -123,7 +123,7 @@ endgrid = zeros(nrend,ncend);
 
 [r, c] = meshgrid(1:nrstart, 1:ncstart);
 rc = [r(:) c(:)];
-%rc = rc(randperm(size(rc,1)),:);
+rc = rc(randperm(size(rc,1)),:); % DEBUG
 
 for k = 1:size(rc,1)
     %if mod(k,100)==0, disp([num2str(k) '/' num2str(size(rc,1))]), end
