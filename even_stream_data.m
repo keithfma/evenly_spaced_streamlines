@@ -69,14 +69,7 @@ function xy = get_stream_xy(x, y, u, v, min_density, max_density)
 % Modified from Mathworks nicestreams() in streamlines.m
 % %
     
-% TODO: experiment to find a better value for stepsize
-stepsize = min(.1, (min(size(v))-1)/100);
-streamoptions = [stepsize min(10000,sum(size(v))*2/stepsize)];
-
-vertsout = {};
-
 num = 20;
-
 nrstart = ceil(num*min_density);
 ncstart = ceil(num*min_density);
 nrend   = ceil(num*max_density);
@@ -96,6 +89,9 @@ iyrangers = nrstart/yrange*(1-eps);
 ixrangece = ncend/xrange*(1-eps);
 iyrangere = nrend/yrange*(1-eps);
 
+stepsize = min( [0.1, (size(v)-1)./([nrend,ncend]-1)] );
+streamoptions = [stepsize min(10000,sum(size(v))*2/stepsize)];
+
 % startgrid and endgrid are used to keep track of the location/density
 % of streamlines. As new streamlines are created, the values in these
 % matrices will indicate whether a streamline has passed through each
@@ -113,6 +109,7 @@ endgrid = zeros(nrend,ncend);
 rc = [r(:) c(:)];
 rc = rc(randperm(size(rc,1)),:); % randomize seed points
 
+vertsout = {};
 for k = 1:size(rc,1)
     %if mod(k,100)==0, disp([num2str(k) '/' num2str(size(rc,1))]), end
     r = rc(k,1);

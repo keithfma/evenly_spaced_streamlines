@@ -39,6 +39,8 @@ ax.YTick = [];
 % control over the maximum streamline density and better results for high
 % streamline densities.
 
+close all
+
 tic
 hf = figure;
 hf.Name = sprintf('%s: even_stream_line', mfilename);
