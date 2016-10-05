@@ -58,12 +58,12 @@ validateattributes(max_density, {'numeric'}, {'scalar', '>' 0}, ...
     mfilename, 'max_density');
 
 % compute results
-xy = get_stream_xy(xx, yy, uu, vv, min_density, max_density);
+[xy, len] = get_stream_xy(xx, yy, uu, vv, min_density, max_density);
 if nargout == 2
-    dist = get_stream_dist(xy);
+    dist = get_stream_dist(xy, len);
 end
 
-function xy = get_stream_xy(x, y, u, v, min_density, max_density)
+function [xy, len] = get_stream_xy(x, y, u, v, min_density, max_density)
 % Return streamline vertices
 % 
 % Modified from Mathworks nicestreams() in streamlines.m
@@ -110,6 +110,7 @@ rc = [r(:) c(:)];
 rc = rc(randperm(size(rc,1)),:); % randomize seed points
 
 vertsout = {};
+len = [];
 for k = 1:size(rc,1)
     %if mod(k,100)==0, disp([num2str(k) '/' num2str(size(rc,1))]), end
     r = rc(k,1);
@@ -178,7 +179,8 @@ for k = 1:size(rc,1)
             vo{q} = vv(1:j-1,:);
             
         end
-        vertsout{end+1} = [flipud(vo{2}); vo{1}(2:end,:)]; %#ok!
+        vertsout{end+1} = [flipud(vo{2}); vo{1}(2:end,:)]; %#ok!        
+        len(end+1) = size(vertsout{end}, 1); %#ok! store line length in pts
         vertsout{end+1} = [NaN, NaN]; %#ok! add NaNs to separate lines
     end    
 end
@@ -186,21 +188,20 @@ end
 % reformat cell array as single matrix with NaNs separating lines
 xy = cell2mat(vertsout');
 
-function dist = get_stream_dist(xy)
+function dist = get_stream_dist(xy, len)
 % Return distance to nearest vertex in neighboring streamline for all
 % vertices in xy.
 % %
 
-% dist = nan(size(xy, 1), 1);
-% kk = 1;
-% for ii = 1:num_lines
-%     if verbose
-%         fprintf('%s: dist: line %d of %d\n', mfilename, ii, num_lines);
-%     end
-%     stream_xy = stream_tri.Points(1:stream_len(ii), :);
-%     stream_tri.Points(1:stream_len(ii), :) = [];
-%     [~, stream_dist] = nearestNeighbor(stream_tri, stream_xy);
-%     dist(kk:kk+stream_len(ii)-1) = stream_dist;
-%     kk = kk+stream_len(ii)+1;
-%     stream_tri.Points = [stream_tri.Points; stream_xy];
-% end
+num_lines = length(len);
+stream_tri = delaunayTriangulation(xy(~isnan(xy(:,1)), :));
+dist = nan(size(xy, 1), 1);
+kk = 1;
+for ii = 1:num_lines
+    stream_xy = stream_tri.Points(1:len(ii), :);
+    stream_tri.Points(1:len(ii), :) = [];
+    [~, stream_dist] = nearestNeighbor(stream_tri, stream_xy);
+    dist(kk:kk+len(ii)-1) = stream_dist;
+    kk = kk+len(ii)+1;
+    stream_tri.Points = [stream_tri.Points; stream_xy];
+end

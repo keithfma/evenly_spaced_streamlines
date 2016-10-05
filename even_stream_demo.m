@@ -69,16 +69,10 @@ fprintf('even_stream_arrow: %.3f s elapsed\n', toc);
 % Plot stream lines with tapering effect, such that line width scales with
 % the distance to the nearest neighboring streamline.
 
-% compute
-tic
-[xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf('even_stream_data: %.3f s elapsed\n', toc);
-
-% plot
-tic
 hf = figure;
 hf.Name = sprintf('%s: even stream taper', mfilename);
-even_stream_taper(xy, dist, 'LineWidthMin', 0.5, 'LineWidthMax', 2, 'Color', 'k');
+even_stream_taper(xx, yy, dzdx, dzdy, 1, 2, ...
+    'LineWidthMin', 0.5, 'LineWidthMax', 3, 'Color', 'k');
 title('even\_stream\_taper');
 ax = gca;
 ax.XTick = [];
@@ -90,9 +84,6 @@ fprintf('even_stream_taper: %.3f s elapsed\n', toc);
 % closely-spaced streamlines, in which case it mimics the popular
 % line-integral-convilution (LIC) method for visualizing flow fields.
 
-close all
-
-% plot
 hf = figure;
 hf.Name = sprintf('%s: even stream texture', mfilename);
 xy = even_stream_texture(xx, yy, dzdx, dzdy, 20, 40, ...
