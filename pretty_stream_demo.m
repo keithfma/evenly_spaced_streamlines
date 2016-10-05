@@ -1,11 +1,16 @@
-%% Evenly Spaced Streamlines
-% This package plots evenly spaced streamlines for a 2D vector field using
-% the algorithm described in Jobar & Lefer, 1997 [1]. Four types of plots
-% are included (as in [1]): line, arrow, taper, texture. Streamline
-% computation and plotting are split, so that the data can be replotted
-% without unnecessarily repeating the computations. In the remainder of
-% this document, each type of plot is genereated for an example vector
-% field.
+%% Pretty Streamlines
+% This package plots evenly spaced streamlines for a 2D vector in several
+% styles described in Jobar & Lefer, 1997 [1]. Four types of plots are
+% included: simple, arrow, taper, texture. The heavy-lifting of computing
+% evenly-spaced streamlines is handled by the built-in streamslice()
+% function, which uses an algorithm quite similar to [1]. 
+% 
+% Calculations can be slow for dense streamlines, so each plotting function
+% returns streamline data, and can re-use this data to plot with different
+% parameters.
+%
+% In the remainder of this document, each type of plot is genereated for an
+% example vector field.
 
 %% Example vector field
 % The vector field for is the gradient of a simple surface with a single
@@ -29,26 +34,21 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 
-%% Plot stream lines
-% Compute streamlines and plot using a simple line style.
+%% Simple stream lines
+% Plot evenly spaced streamlines using a simple line style. This function
+% is really just a thin wrapper around the built-in streamslice(). It is
+% included mainly for completeness - i.e. so that it is possible to make a
+% simple plot as well a more complicated "pretty" plot.
 
-% parameters
-
-% compute
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf('even_stream_data: %.3f s elapsed\n', toc);
-
-% plot
 tic
 hf = figure;
-hf.Name = sprintf('%s: even stream line', mfilename);
-even_stream_line(xy, 'LineWidth', 0.5, 'Color', 'k', 'LineStyle', '-');
-title('even\_stream\_line');
+hf.Name = sprintf('%s: pretty_stream_line', mfilename);
+pretty_stream_line(xx, yy, dzdx, dzdy, 1, 'Color', 'k', 'LineWidth', 1);
+title('pretty\_stream\_simple');
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
-fprintf('even_stream_line: %.3f s elapsed\n', toc);
+fprintf('pretty_stream_line: %.3f s elapsed\n', toc);
 
 %% Plot stream lines with arrow glyphs 
 % Compute streamlines and plot lines with arrow glyphs to indicate flow
