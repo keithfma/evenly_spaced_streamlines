@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Evenly Spaced Streamlines</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-10-04"><meta name="DC.source" content="even_stream_demo.m"><style type="text/css">
+      --><title>Evenly Spaced Streamlines</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-10-05"><meta name="DC.source" content="even_stream_demo.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Evenly Spaced Streamlines</h1><!--introduction--><p>This package plots evenly spaced streamlines for a 2D vector field using the algorithm described in Jobar &amp; Lefer, 1997 [1]. Four types of plots are included (as in [1]): line, arrow, taper, texture. Streamline computation and plotting are split, so that the data can be replotted without unnecessarily repeating the computations. In the remainder of this document, each type of plot is genereated for an example vector field.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Example vector field</a></li><li><a href="#2">Plot stream lines</a></li><li><a href="#3">Plot stream lines with arrow glyphs</a></li><li><a href="#4">Plot tapered stream lines</a></li><li><a href="#5">Plot textured stream lines</a></li><li><a href="#6">References</a></li></ul></div><h2>Example vector field<a name="1"></a></h2><p>The vector field for is the gradient of a simple surface with a single local minimum and maximum.</p><pre class="codeinput"><span class="comment">% create vector field</span>
+  </style></head><body><div class="content"><h1>Evenly Spaced Streamlines</h1><!--introduction--><p>The purpose of this package is to plot evenly spaced streamlines for a 2D vector field with more flexible style options than the standard function streamslice(). Specifically, this package includes:</p><div><ul><li>"Fancy" arrow, taper, and texture styles as described Jobar &amp; Lefer [1]</li><li>Explicit control over both minimum and maximum streamline spacing</li><li>Better selection of streamline step size for high line densities</li></ul></div><p>The heavy-lifting of computing evenly-spaced streamlines is handled by a modified version of streamslice.m, which uses an algorithm quite similar to [1].</p><p>In the remainder of this document, each type of plot is genereated for an example vector field. Enjoy!</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Example vector field</a></li><li><a href="#2">Simple stream lines</a></li><li><a href="#3">Plot stream lines with arrow glyphs</a></li><li><a href="#4">Plot tapered stream lines</a></li><li><a href="#5">Plot textured stream lines</a></li><li><a href="#6">References</a></li></ul></div><h2>Example vector field<a name="1"></a></h2><p>The vector field for is the gradient of a simple surface with a single local minimum and maximum.</p><pre class="codeinput"><span class="comment">% create vector field</span>
 vv = linspace(-2, 2, 20);
 hh = vv(2)-vv(1);
 [xx, yy] = meshgrid(vv);
@@ -76,95 +76,70 @@ zz = xx .* exp(-xx.^2 - yy.^2);
 <span class="comment">% plot surface and vector field</span>
 hf = figure;
 hf.Name = sprintf(<span class="string">'%s: example vector field'</span>, mfilename);
-imagesc([vv(1), vv(end)], [vv(1), vv(end)], zz);
-hold <span class="string">on</span>
-quiver(xx, yy, dzdx, dzdy, <span class="string">'Color'</span>, <span class="string">'k'</span>);
+quiver(xx, yy, dzdx, dzdy, 1.5, <span class="string">'Color'</span>, <span class="string">'k'</span>);
 title(<span class="string">'Example Vector Field'</span>);
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
-</pre><img vspace="5" hspace="5" src="even_stream_demo_01.png" style="width:560px;height:420px;" alt=""> <h2>Plot stream lines<a name="2"></a></h2><p>Compute streamlines and plot using a simple line style.</p><pre class="codeinput"><span class="comment">% parameters</span>
-
-<span class="comment">% compute</span>
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf(<span class="string">'even_stream_data: %.3f s elapsed\n'</span>, toc);
-
-<span class="comment">% plot</span>
-tic
+</pre><img vspace="5" hspace="5" src="even_stream_demo_01.png" alt=""> <h2>Simple stream lines<a name="2"></a></h2><p>The even_stream_line() function plots evenly spaced streamlines using a simple line style. This function is quite similar to the Mathworks function streamslice(), with added control over the maximum streamline density and better results for high streamline densities.</p><pre class="codeinput">tic
 hf = figure;
-hf.Name = sprintf(<span class="string">'%s: even stream line'</span>, mfilename);
-even_stream_line(xy, <span class="string">'LineWidth'</span>, 0.5, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'LineStyle'</span>, <span class="string">'-'</span>);
+hf.Name = sprintf(<span class="string">'%s: even_stream_line'</span>, mfilename);
+even_stream_line(xx, yy, dzdx, dzdy, 1, 2, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'LineWidth'</span>, 1);
 title(<span class="string">'even\_stream\_line'</span>);
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_line: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 0.604 s elapsed
-even_stream_line: 0.053 s elapsed
-</pre><img vspace="5" hspace="5" src="even_stream_demo_02.png" style="width:560px;height:420px;" alt=""> <h2>Plot stream lines with arrow glyphs<a name="3"></a></h2><p>Compute streamlines and plot lines with arrow glyphs to indicate flow direction.</p><pre class="codeinput"><span class="comment">% compute</span>
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf(<span class="string">'even_stream_data: %.3f s elapsed\n'</span>, toc);
-
-<span class="comment">% plot</span>
-tic
+</pre><pre class="codeoutput">even_stream_line: 0.161 s elapsed
+</pre><img vspace="5" hspace="5" src="even_stream_demo_02.png" alt=""> <h2>Plot stream lines with arrow glyphs<a name="3"></a></h2><p>The even_stream_arrow() function adds arrow glyphs to indicate flow direction. The arrows are plotted using the 'arrow' package by Dr. Erik A. Johnson from the Mathworks File Exchange, which provides some control over arrow appearance.</p><pre class="codeinput">tic
 hf = figure;
 hf.Name = sprintf(<span class="string">'%s: even stream arrow'</span>, mfilename);
-even_stream_arrow(xy, <span class="string">'LineStyle'</span>, <span class="string">'-'</span>, <span class="string">'LineWidth'</span>, 0.5, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="keyword">...</span>
-    <span class="string">'ArrowLength'</span>, 4, <span class="string">'ArrowTipAngle'</span>, 30, <span class="string">'ArrowBaseAngle'</span>, 10, <span class="keyword">...</span>
-    <span class="string">'ArrowSpace'</span>, 0.05*range(vv));
+even_stream_arrow(xx, yy, dzdx, dzdy, 1, 2, <span class="keyword">...</span>
+    <span class="string">'LineStyle'</span>, <span class="string">'-'</span>, <span class="string">'LineWidth'</span>, 0.5, <span class="string">'Color'</span>, <span class="string">'k'</span>, <span class="string">'ArrowLength'</span>, 4, <span class="keyword">...</span>
+    <span class="string">'ArrowTipAngle'</span>, 30, <span class="string">'ArrowBaseAngle'</span>, 10, <span class="string">'ArrowDensity'</span>, 2);
 title(<span class="string">'even\_stream\_arrow'</span>);
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_arrow: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 0.648 s elapsed
-even_stream_arrow: 0.443 s elapsed
-</pre><img vspace="5" hspace="5" src="even_stream_demo_03.png" style="width:560px;height:420px;" alt=""> <h2>Plot tapered stream lines<a name="4"></a></h2><p>Plot stream lines with tapering effect, such that line width scales with the distance to the nearest neighboring streamline.</p><pre class="codeinput"><span class="comment">% compute</span>
-tic
-[xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf(<span class="string">'even_stream_data: %.3f s elapsed\n'</span>, toc);
-
-<span class="comment">% plot</span>
-tic
-hf = figure;
+</pre><pre class="codeoutput">even_stream_arrow: 0.913 s elapsed
+</pre><img vspace="5" hspace="5" src="even_stream_demo_03.png" alt=""> <h2>Plot tapered stream lines<a name="4"></a></h2><p>The even_stream_taper() function scales streamline width by the distance to the nearest neighboring line to produce a tapered "hand-drawn" effect.</p><pre class="codeinput">hf = figure;
 hf.Name = sprintf(<span class="string">'%s: even stream taper'</span>, mfilename);
-even_stream_taper(xy, dist, <span class="string">'LineWidthMin'</span>, 0.5, <span class="string">'LineWidthMax'</span>, 2, <span class="string">'Color'</span>, <span class="string">'k'</span>);
+even_stream_taper(xx, yy, dzdx, dzdy, 1, 2, <span class="keyword">...</span>
+    <span class="string">'LineWidthMin'</span>, 0.5, <span class="string">'LineWidthMax'</span>, 3, <span class="string">'Color'</span>, <span class="string">'k'</span>);
 title(<span class="string">'even\_stream\_taper'</span>);
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_taper: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 1.423 s elapsed
-even_stream_taper: 0.145 s elapsed
-</pre><img vspace="5" hspace="5" src="even_stream_demo_04.png" style="width:560px;height:420px;" alt=""> <h2>Plot textured stream lines<a name="5"></a></h2><p>Plot streamlines with texture effect. This is most effective with closely-spaced streamlines, in which case it mimics the popular line-integral-convilution (LIC) method for visualizing flow fields.</p><pre class="codeinput"><span class="comment">% compute</span>
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
-fprintf(<span class="string">'even_stream_data: %.3f s elapsed\n'</span>, toc);
-
-<span class="comment">% plot</span>
-tic
-hf = figure;
+</pre><pre class="codeoutput">even_stream_taper: 3.436 s elapsed
+</pre><img vspace="5" hspace="5" src="even_stream_demo_04.png" alt=""> <h2>Plot textured stream lines<a name="5"></a></h2><p>The even_stream_texture() function adds a periodi grayscale pattern along the length of each line. For closely-spaced streamlines, this mimics the popular line-integral-convilution (LIC) visualization method.</p><pre class="codeinput">hf = figure;
 hf.Name = sprintf(<span class="string">'%s: even stream texture'</span>, mfilename);
-even_stream_texture(xy, <span class="string">'LineWidth'</span>, 1, <span class="string">'Period'</span>, 0.20*range(vv));
+xy = even_stream_texture(xx, yy, dzdx, dzdy, 20, 40, <span class="keyword">...</span>
+    <span class="string">'LineWidth'</span>, 1, <span class="string">'Period'</span>, 1);
 title(<span class="string">'even\_stream\_texture'</span>);
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_texture: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 243.388 s elapsed
-even_stream_texture: 0.799 s elapsed
-</pre><img vspace="5" hspace="5" src="even_stream_demo_05.png" style="width:560px;height:420px;" alt=""> <h2>References<a name="6"></a></h2><div><ol><li>Jobard, B., &amp; Lefer, W. (1997). Creating Evenly-Spaced Streamlines of   Arbitrary Density. In W. Lefer &amp; M. Grave (Eds.), Visualization in   Scientific Computing ?97: Proceedings of the Eurographics Workshop in   Boulogne-sur-Mer France, April 28--30, 1997 (pp. 43?55). inbook,   Vienna: Springer Vienna. <a href="http://doi.org/10.1007/978-3-7091-6876-9_5">http://doi.org/10.1007/978-3-7091-6876-9_5</a></li></ol></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016a</a><br></p></div><!--
+</pre><pre class="codeoutput">even_stream_texture: 12.158 s elapsed
+</pre><img vspace="5" hspace="5" src="even_stream_demo_05.png" alt=""> <h2>References<a name="6"></a></h2><div><ol><li>Jobard, B., &amp; Lefer, W. (1997). Creating Evenly-Spaced Streamlines of   Arbitrary Density. In W. Lefer &amp; M. Grave (Eds.), Visualization in   Scientific Computing ?97: Proceedings of the Eurographics Workshop in   Boulogne-sur-Mer France, April 28--30, 1997 (pp. 43?55). inbook,   Vienna: Springer Vienna. <a href="http://doi.org/10.1007/978-3-7091-6876-9_5">http://doi.org/10.1007/978-3-7091-6876-9_5</a></li></ol></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Evenly Spaced Streamlines
-% This package plots evenly spaced streamlines for a 2D vector field using
-% the algorithm described in Jobar & Lefer, 1997 [1]. Four types of plots
-% are included (as in [1]): line, arrow, taper, texture. Streamline
-% computation and plotting are split, so that the data can be replotted
-% without unnecessarily repeating the computations. In the remainder of
-% this document, each type of plot is genereated for an example vector
-% field.
+% The purpose of this package is to plot evenly spaced streamlines for a 2D
+% vector field with more flexible style options than the standard
+% function streamslice(). Specifically, this package includes: 
+% 
+% * "Fancy" arrow, taper, and texture styles as described Jobar & Lefer [1] 
+% * Explicit control over both minimum and maximum streamline spacing
+% * Better selection of streamline step size for high line densities
+% 
+% The heavy-lifting of computing evenly-spaced streamlines is handled by a
+% modified version of streamslice.m, which uses an algorithm quite
+% similar to [1].
+%
+% In the remainder of this document, each type of plot is genereated for an
+% example vector field. Enjoy!
 
 %% Example vector field
 % The vector field for is the gradient of a simple surface with a single
@@ -180,29 +155,22 @@ zz = xx .* exp(-xx.^2 - yy.^2);
 % plot surface and vector field
 hf = figure;
 hf.Name = sprintf('%s: example vector field', mfilename);
-imagesc([vv(1), vv(end)], [vv(1), vv(end)], zz);
-hold on
-quiver(xx, yy, dzdx, dzdy, 'Color', 'k');
+quiver(xx, yy, dzdx, dzdy, 1.5, 'Color', 'k');
 title('Example Vector Field');
 ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 
-%% Plot stream lines
-% Compute streamlines and plot using a simple line style.
+%% Simple stream lines
+% The even_stream_line() function plots evenly spaced streamlines using a
+% simple line style. This function is quite similar to the Mathworks
+% function streamslice(), with added control over the maximum streamline
+% density and better results for high streamline densities.
 
-% parameters
-
-% compute
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf('even_stream_data: %.3f s elapsed\n', toc);
-
-% plot
 tic
 hf = figure;
-hf.Name = sprintf('%s: even stream line', mfilename);
-even_stream_line(xy, 'LineWidth', 0.5, 'Color', 'k', 'LineStyle', '-');
+hf.Name = sprintf('%s: even_stream_line', mfilename);
+even_stream_line(xx, yy, dzdx, dzdy, 1, 2, 'Color', 'k', 'LineWidth', 1);
 title('even\_stream\_line');
 ax = gca;
 ax.XTick = [];
@@ -210,21 +178,17 @@ ax.YTick = [];
 fprintf('even_stream_line: %.3f s elapsed\n', toc);
 
 %% Plot stream lines with arrow glyphs 
-% Compute streamlines and plot lines with arrow glyphs to indicate flow
-% direction. 
+% The even_stream_arrow() function adds arrow glyphs to indicate flow
+% direction. The arrows are plotted using the 'arrow' package by
+% Dr. Erik A. Johnson from the Mathworks File Exchange, which provides some
+% control over arrow appearance.
 
-% compute
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf('even_stream_data: %.3f s elapsed\n', toc);
-
-% plot
 tic
 hf = figure;
 hf.Name = sprintf('%s: even stream arrow', mfilename);
-even_stream_arrow(xy, 'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', ...
-    'ArrowLength', 4, 'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, ...
-    'ArrowSpace', 0.05*range(vv));
+even_stream_arrow(xx, yy, dzdx, dzdy, 1, 2, ...
+    'LineStyle', '-', 'LineWidth', 0.5, 'Color', 'k', 'ArrowLength', 4, ...
+    'ArrowTipAngle', 30, 'ArrowBaseAngle', 10, 'ArrowDensity', 2);
 title('even\_stream\_arrow');
 ax = gca;
 ax.XTick = [];
@@ -232,19 +196,13 @@ ax.YTick = [];
 fprintf('even_stream_arrow: %.3f s elapsed\n', toc);
 
 %% Plot tapered stream lines
-% Plot stream lines with tapering effect, such that line width scales with
-% the distance to the nearest neighboring streamline.
+% The even_stream_taper() function scales streamline width by the distance
+% to the nearest neighboring line to produce a tapered "hand-drawn" effect.
 
-% compute
-tic
-[xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
-fprintf('even_stream_data: %.3f s elapsed\n', toc);
-
-% plot
-tic
 hf = figure;
 hf.Name = sprintf('%s: even stream taper', mfilename);
-even_stream_taper(xy, dist, 'LineWidthMin', 0.5, 'LineWidthMax', 2, 'Color', 'k');
+even_stream_taper(xx, yy, dzdx, dzdy, 1, 2, ...
+    'LineWidthMin', 0.5, 'LineWidthMax', 3, 'Color', 'k');
 title('even\_stream\_taper');
 ax = gca;
 ax.XTick = [];
@@ -252,20 +210,14 @@ ax.YTick = [];
 fprintf('even_stream_taper: %.3f s elapsed\n', toc);
 
 %% Plot textured stream lines
-% Plot streamlines with texture effect. This is most effective with
-% closely-spaced streamlines, in which case it mimics the popular
-% line-integral-convilution (LIC) method for visualizing flow fields.
+% The even_stream_texture() function adds a periodi grayscale pattern along
+% the length of each line. For closely-spaced streamlines, this mimics the
+% popular line-integral-convilution (LIC) visualization method.
 
-% compute
-tic
-xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
-fprintf('even_stream_data: %.3f s elapsed\n', toc);
-
-% plot
-tic
 hf = figure;
 hf.Name = sprintf('%s: even stream texture', mfilename);
-even_stream_texture(xy, 'LineWidth', 1, 'Period', 0.20*range(vv));
+xy = even_stream_texture(xx, yy, dzdx, dzdy, 20, 40, ...
+    'LineWidth', 1, 'Period', 1);
 title('even\_stream\_texture');
 ax = gca;
 ax.XTick = [];
