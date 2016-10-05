@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Evenly Spaced Streamlines</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-10-03"><meta name="DC.source" content="even_stream_demo.m"><style type="text/css">
+      --><title>Evenly Spaced Streamlines</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-10-04"><meta name="DC.source" content="even_stream_demo.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -100,8 +100,8 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_line: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 0.795 s elapsed
-even_stream_line: 0.067 s elapsed
+</pre><pre class="codeoutput">even_stream_data: 0.604 s elapsed
+even_stream_line: 0.053 s elapsed
 </pre><img vspace="5" hspace="5" src="even_stream_demo_02.png" style="width:560px;height:420px;" alt=""> <h2>Plot stream lines with arrow glyphs<a name="3"></a></h2><p>Compute streamlines and plot lines with arrow glyphs to indicate flow direction.</p><pre class="codeinput"><span class="comment">% compute</span>
 tic
 xy = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
@@ -119,8 +119,8 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_arrow: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 0.621 s elapsed
-even_stream_arrow: 0.645 s elapsed
+</pre><pre class="codeoutput">even_stream_data: 0.648 s elapsed
+even_stream_arrow: 0.443 s elapsed
 </pre><img vspace="5" hspace="5" src="even_stream_demo_03.png" style="width:560px;height:420px;" alt=""> <h2>Plot tapered stream lines<a name="4"></a></h2><p>Plot stream lines with tapering effect, such that line width scales with the distance to the nearest neighboring streamline.</p><pre class="codeinput"><span class="comment">% compute</span>
 tic
 [xy, dist] = even_stream_data(xx, yy, dzdx, dzdy, 0.05, 0.025);
@@ -136,8 +136,8 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_taper: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 1.599 s elapsed
-even_stream_taper: 0.156 s elapsed
+</pre><pre class="codeoutput">even_stream_data: 1.423 s elapsed
+even_stream_taper: 0.145 s elapsed
 </pre><img vspace="5" hspace="5" src="even_stream_demo_04.png" style="width:560px;height:420px;" alt=""> <h2>Plot textured stream lines<a name="5"></a></h2><p>Plot streamlines with texture effect. This is most effective with closely-spaced streamlines, in which case it mimics the popular line-integral-convilution (LIC) method for visualizing flow fields.</p><pre class="codeinput"><span class="comment">% compute</span>
 tic
 xy = even_stream_data(xx, yy, dzdx, dzdy, 0.003, 0.0015);
@@ -153,8 +153,8 @@ ax = gca;
 ax.XTick = [];
 ax.YTick = [];
 fprintf(<span class="string">'even_stream_texture: %.3f s elapsed\n'</span>, toc);
-</pre><pre class="codeoutput">even_stream_data: 247.593 s elapsed
-even_stream_texture: 0.752 s elapsed
+</pre><pre class="codeoutput">even_stream_data: 243.388 s elapsed
+even_stream_texture: 0.799 s elapsed
 </pre><img vspace="5" hspace="5" src="even_stream_demo_05.png" style="width:560px;height:420px;" alt=""> <h2>References<a name="6"></a></h2><div><ol><li>Jobard, B., &amp; Lefer, W. (1997). Creating Evenly-Spaced Streamlines of   Arbitrary Density. In W. Lefer &amp; M. Grave (Eds.), Visualization in   Scientific Computing ?97: Proceedings of the Eurographics Workshop in   Boulogne-sur-Mer France, April 28--30, 1997 (pp. 43?55). inbook,   Vienna: Springer Vienna. <a href="http://doi.org/10.1007/978-3-7091-6876-9_5">http://doi.org/10.1007/978-3-7091-6876-9_5</a></li></ol></div><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Evenly Spaced Streamlines
