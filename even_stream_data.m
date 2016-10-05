@@ -96,7 +96,7 @@ while 1
     kk = randi([1, numel(xx)]);
     seed_xy = [xx(kk), yy(kk)];
     [stream_xy, ~] = get_streamline(xx, yy, uu, vv, seed_xy, step_size);
-    if ~isempty(stream_xy)
+    if size(stream_xy,1) > 2
         break
     end
 end
@@ -124,13 +124,13 @@ while ~isempty(seed_queue)
             continue
         end
         
-        % create new streamline, skip if empty
+        % create new streamline, skip if too short
         [stream_xy, seed_idx] = get_streamline(xx, yy, uu, vv, seed_xy(ii,:), step_size);
         if size(stream_xy,1) < 2
             continue
         end
         
-        % trim new streamline
+        % trim new streamline, skip if to short
         for jj = seed_idx:size(stream_xy,1)
             [~, d_min] = nearestNeighbor(stream_tri, stream_xy(jj,:));
             if d_min < dist_test
@@ -144,6 +144,9 @@ while ~isempty(seed_queue)
             end
         end
         stream_xy = stream_xy(kk:jj, :);
+        if size(stream_xy,1) < 2
+            continue
+        end
         
         % add streamline to triangulation and line length list
         len0 = size(stream_tri.Points, 1);
@@ -248,7 +251,7 @@ if has_fwd && has_rev
     stream_xy = [xy_rev(end:-1:2, :); xy_fwd];
     seed_idx = size(xy_rev,1);
 elseif has_rev
-    stream_xy = xy_rev;
+    stream_xy = xy_rev(end:-1:1, :);
     seed_idx = 1;
 elseif has_fwd
     stream_xy = xy_fwd;
