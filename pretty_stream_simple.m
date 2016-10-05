@@ -1,9 +1,9 @@
 function [hh, xy] = pretty_stream_simple(varargin)
-% Plot evenly-spaced streamlines in the style of Jobar & Lefer [1], using
-% the built-in streamslice() to do the heavy lifting of computing lines.
+% Compute and plot evenly-spaced streamlines for a vector field
 %
 % pretty_stream_simple(xx, yy, uu, vv)
-% pretty_stream_simple(xx, yy, uu, vv, density)
+% pretty_stream_simple(xx, yy, uu, vv, min_density)
+% pretty_stream_simple(xx, yy, uu, vv, min_density, max_density)
 % pretty_stream_simple(xy)
 % pretty_stream_simple(..., Name, Value)
 % [hh, xy] = pretty_stream_simple(...)
@@ -13,13 +13,17 @@ function [hh, xy] = pretty_stream_simple(varargin)
 %       size must match uu and vv. If vectors, xx must match the number of
 %       columns in uu and vv, and yy must match the number of rows.
 %   uu, vv: Matrices, vector field x-component and y-component
-%   density: Scalar, coefficient specifying the density (spacing) of
+%   min_density: Scalar, specifies the minimum density (spacing) of
 %       streamlines. From the streamslice() documentation: "modifies the
 %       automatic spacing of the streamlines. DENSITY must be greater than
 %       0. The default value is 1; higher values will produce more
 %       streamlines on each plane. For example, 2 will produce
 %       approximately twice as many streamlines while 0.5 will produce
 %       approximately half as many."
+%   max_density: Scalar, " " maximum " ", default is 2
+%   xy: Matrix, [x, y] coordinates for stream line points, each row is a
+%       point, individual lines are separated by NaNs.
+%   hh = Graphics object for streamlines
 %
 % Parameters (Name, Value):
 %   'LineStyle': line style as in plot(), default = '-'
@@ -27,9 +31,6 @@ function [hh, xy] = pretty_stream_simple(varargin)
 %   'Color': line color as in plot(), default = 'b'
 %
 % Returns:
-%   hh = Graphics object for streamlines
-%   xy: Matrix, [x, y] coordinates for stream line points, each row is a
-%       point, individual lines are separated by NaNs.
 %  
 % References: 
 % [1] Jobard, B., & Lefer, W. (1997). Creating Evenly-Spaced Streamlines of
@@ -52,13 +53,14 @@ function [hh, xy] = pretty_stream_simple(varargin)
 parser = inputParser;
 parser.CaseSensitive = false;
 parser.PartialMatching = false;
-parser.KeepUnmatched = true;
+parser.KeepUnmatched = false;
 
 parser.addRequired('xx_or_xy');
 parser.addOptional('yy', []);
 parser.addOptional('vv', []);
 parser.addOptional('uu', []);
-parser.addOptional('density', []);
+parser.addOptional('min_density', []);
+parser.addOptional('max_density', []);
 parser.addParameter('LineStyle', '-');
 parser.addParameter('LineWidth', 0.5);
 parser.addParameter('Color', 'b');
@@ -69,26 +71,23 @@ xx_or_xy = parser.Results.xx_or_xy;
 yy = parser.Results.yy;
 uu = parser.Results.uu;
 vv = parser.Results.vv;
-density = parser.Results.density;
+min_density = parser.Results.min_density;
+max_density = parser.Results.max_density;
 line_style = parser.Results.LineStyle;
 line_width = parser.Results.LineWidth;
 line_color = parser.Results.Color;
 
-% get evenly spaced streamlines
-if isempty(yy) && isempty(uu) && isempty(vv) && isempty(density)
-    % read xy from input arguments
+% get stream lines
+optional = ~[isempty(yy), isempty(uu), isempty(vv), isempty(min_density), isempty(max_density)];
+if all(optional)
+    xx = xx_or_xy;
+    xy = even_stream_data(xx, yy, uu, vv, min_density, max_density);
+elseif ~any(optional)
     xy = xx_or_xy;
 else
-    % compute stream lines with built-in function and reformat as xy
-    xx = xx_or_xy;
-    [stream_cell, ~] = streamslice(xx, yy, uu, vv, density);    
-    num_lines = length(stream_cell);
-    stream_sep = cell(1, num_lines);
-    [stream_sep{:}] = deal(nan(1,2));
-    stream_cell = reshape([stream_cell; stream_sep], 2*num_lines, 1);
-    xy = cell2mat(stream_cell);
+    error('Invalid input arguments, see help %s', mfilename)
 end
 
-% create plot
+% plot stream lines
 hh = plot(xy(:,1), xy(:,2), ...
     'LineStyle', line_style, 'LineWidth', line_width, 'Color', line_color);
